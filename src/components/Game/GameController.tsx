@@ -331,8 +331,8 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     );
   }
 
-  // Get marks to display on map - always show context marks for guess mode
-  const visibleMarks = [currentQuestion.targetMark, ...(currentQuestion.contextMarks || [])];
+  // Get marks to display on map - show all loaded marks
+  const visibleMarks = marks || [];
   const hiddenMarks: string[] = [];
 
   return (
@@ -351,7 +351,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         {/* Mobile Layout: Stack vertically */}
         <div className="md:hidden">
           {/* Map Section - Full width on mobile */}
-          <div className="bg-white">
+          <div className="bg-white mt-[64px]">
                 <OpenSeaMapContainer
                   marks={visibleMarks}
                   center={mapCenter}

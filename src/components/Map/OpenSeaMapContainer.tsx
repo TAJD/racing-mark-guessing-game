@@ -92,20 +92,6 @@ export function OpenSeaMapContainer({
     });
   };
 
-  const getMarkColor = (symbol: string, markId: string): string => {
-    switch (symbol) {
-      case 'R': return '#dc2626';
-      case 'G': return '#16a34a';
-      case 'Y': return '#ca8a04';
-      case 'B': return '#2563eb';
-      case 'RW': return `url(#redWhiteStripe-${markId})`;
-      case 'YBY': return `url(#yellowBlackYellow-${markId})`;
-      case 'BYB': return `url(#blackYellowBlack-${markId})`;
-      case 'BY': return `url(#blackYellow-${markId})`;
-      case 'YB': return `url(#yellowBlack-${markId})`;
-      default: return '#ca8a04';
-    }
-  };
 
   // Initialize map
   useEffect(() => {
@@ -176,8 +162,6 @@ export function OpenSeaMapContainer({
 
     // Add new markers
     marks.forEach(mark => {
-      if (hiddenMarks.includes(mark.id)) return;
-
       const isHighlighted = highlightedMark === mark.id;
       const icon = createMarkIcon(mark, isHighlighted);
       
@@ -193,12 +177,26 @@ export function OpenSeaMapContainer({
     });
   }, [marks, onMarkClick, highlightedMark, hiddenMarks]);
 
-  // Update map view when center changes
+  // Update map view when center changes or highlightedMark changes
   useEffect(() => {
     if (mapRef.current) {
+      // If highlightedMark is present, fit bounds to include all visible marks (target + context)
+      if (highlightedMark && marks.length > 0) {
+        // Zoom to area +/- 500m from the mark being guessed (highlightedMark)
+        const target = marks.find(m => m.id === highlightedMark);
+        if (target) {
+          const delta = 0.0045; // ~500m in degrees
+          const bounds: L.LatLngBoundsLiteral = [
+            [target.lat - delta, target.lon - delta],
+            [target.lat + delta, target.lon + delta]
+          ];
+          mapRef.current.fitBounds(bounds, { maxZoom: zoom });
+          return;
+        }
+      }
       mapRef.current.setView(center, zoom);
     }
-  }, [center, zoom]);
+  }, [center, zoom, highlightedMark, marks]);
 
   return (
     <div className={className}>
