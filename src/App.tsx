@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { GameController } from './components/Game/GameController'
 import type { GameConfig } from './types/game'
-import { APP_TITLE } from './constants/app'
 import { getTimeLimit } from './utils/gameLogic'
 import './App.css'
 
