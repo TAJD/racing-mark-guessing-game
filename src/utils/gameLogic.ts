@@ -91,11 +91,18 @@ export function evaluateGuess(
   // Base points for correct answer
   let points = isCorrect ? 100 : 0;
   
-  // Time bonus (max 50 extra points for answering quickly)
+  // Time bonus based on difficulty and time left
   let timeBonus = 0;
   if (isCorrect && config.timeLimit) {
-    const timeRatio = Math.max(0, (config.timeLimit - timeElapsed) / config.timeLimit);
-    timeBonus = Math.floor(timeRatio * 50);
+    const maxBonusByDifficulty = {
+      beginner: 30,
+      intermediate: 50,
+      advanced: 70
+    };
+    const maxBonus = maxBonusByDifficulty[config.difficulty] ?? 30;
+    const timeLeft = Math.max(0, config.timeLimit - timeElapsed);
+    const timeRatio = timeLeft / config.timeLimit;
+    timeBonus = Math.floor(timeRatio * maxBonus);
     points += timeBonus;
   }
   
@@ -144,7 +151,7 @@ function getGeneralArea(mark: RacingMark): string {
 }
 
 // Utility function to shuffle an array
-function shuffleArray<T>(array: T[]): void {
+export function shuffleArray<T>(array: T[]): void {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
@@ -160,10 +167,10 @@ export function calculateStreakBonus(streak: number): number {
 // Get difficulty-appropriate time limit
 export function getTimeLimit(difficulty: GameConfig['difficulty']): number {
   switch (difficulty) {
-    case 'beginner': return 60; // 60 seconds
-    case 'intermediate': return 45; // 45 seconds
-    case 'advanced': return 30; // 30 seconds
-    default: return 45;
+    case 'beginner': return 30; // 30 seconds
+    case 'intermediate': return 20; // 20 seconds
+    case 'advanced': return 10; // 10 seconds
+    default: return 30;
   }
 }
 

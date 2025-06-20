@@ -105,14 +105,8 @@ export function GuessMode({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border h-full flex flex-col">
-      <div className="p-4 md:p-6 flex-1 flex flex-col">
-        <h2 className="text-lg md:text-xl font-bold mb-4 text-gray-900">Guess the Mark</h2>
-        
+      <div className="p-4 md:p-6 flex-1 flex flex-col">  
         <div className="mb-6">
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">
-            Look at the map and identify which mark is highlighted. The nearby marks are shown for context.
-          </p>
-          
           {targetMark.sponsor && !targetMark.sponsorHintDisallowed && (
             <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
               <div className="flex items-start gap-2">

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { GameController } from './components/Game/GameController'
 import type { GameConfig } from './types/game'
 import { APP_TITLE } from './constants/app'
+import { getTimeLimit } from './utils/gameLogic'
 import './App.css'
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
   const [gameConfig, setGameConfig] = useState<GameConfig>({
     difficulty: 'beginner',
     numberOfOptions: 5,
-    timeLimit: 60,
+    timeLimit: getTimeLimit('beginner'),
     hintEnabled: false, // changed from true to false
     openSeaMapEnabled: false
   })
@@ -28,14 +29,14 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="max-w-2xl w-full">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 md:p-8 text-center">
               <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">
-                {APP_TITLE}
+                Guess the Mark!
               </h1>
               <p className="text-blue-100 text-base md:text-lg">
                 Test your knowledge of racing marks in the Solent!
@@ -51,7 +52,7 @@ function App() {
                     <div>
                       <h3 className="text-lg md:text-xl font-semibold text-blue-700 mb-2">How to Play</h3>
                       <p className="text-gray-600 mb-3 text-sm md:text-base leading-relaxed">
-                        Look at the nautical chart and identify which racing mark is highlighted. Use nearby context marks and chart features to help you.
+                        Look at the chart and identify which racing mark is highlighted. Use nearby context marks and chart features to help you.
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs md:text-sm text-gray-600">
                         <div className="flex items-center gap-1">
@@ -87,10 +88,14 @@ function App() {
                       </label>
                       <select
                         value={gameConfig.difficulty}
-                        onChange={(e) => setGameConfig(prev => ({ 
-                          ...prev, 
-                          difficulty: e.target.value as GameConfig['difficulty']
-                        }))}
+                        onChange={(e) => {
+                          const newDifficulty = e.target.value as GameConfig['difficulty'];
+                          setGameConfig(prev => ({
+                            ...prev,
+                            difficulty: newDifficulty,
+                            timeLimit: getTimeLimit(newDifficulty)
+                          }));
+                        }}
                         className="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm md:text-base"
                       >
                         <option value="beginner">🌟 Beginner - Famous landmarks</option>
@@ -168,8 +173,8 @@ function App() {
               {/* Footer */}
               <div className="text-center text-xs md:text-sm text-gray-500 border-t border-gray-200 pt-4">
                 <p className="leading-relaxed">
-                  Mark data from the SCRA.
-                  <br className="hidden sm:inline" />
+Mark data from the <a href="https://www.scra.org.uk/" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">SCRA</a>.
+<br className="hidden sm:inline" />
                   Perfect for sailors learning the area or testing their local knowledge!
                 </p>
               </div>

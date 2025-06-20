@@ -78,7 +78,12 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         console.error('No racing marks loaded:', data);
         setGameEnded(true);
       } else {
-        setMarks(data);
+        // Shuffle marks for true randomness each game
+        import('../../utils/gameLogic').then(({ shuffleArray }) => {
+          const shuffled = [...data];
+          shuffleArray(shuffled);
+          setMarks(shuffled);
+        });
       }
     }).catch((err) => {
       console.error('Error loading racing marks:', err);
@@ -225,7 +230,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
         <div className="flex items-center justify-center min-h-screen p-4">
           <div className="max-w-lg w-full">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 text-center">
                 <div className="text-4xl mb-2">🎉</div>
@@ -342,7 +347,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         <div className="bg-white shadow-sm border-b sticky top-0 z-10">
           <div className="px-4 py-3">
             <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
-              <h1 className="text-xl md:text-2xl font-bold text-blue-600">Racing Mark Game</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-blue-600">Guess the Mark!</h1>
               <ScoreDisplay gameState={gameState} timeRemaining={timeRemaining} />
             </div>
           </div>

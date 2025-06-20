@@ -181,9 +181,9 @@ describe('gameLogic', () => {
 
   describe('getTimeLimit', () => {
     it('should return appropriate time limits for each difficulty', () => {
-      expect(getTimeLimit('beginner')).toBe(60)
-      expect(getTimeLimit('intermediate')).toBe(45)
-      expect(getTimeLimit('advanced')).toBe(30)
+      expect(getTimeLimit('beginner')).toBe(30)
+      expect(getTimeLimit('intermediate')).toBe(20)
+      expect(getTimeLimit('advanced')).toBe(10)
     })
   })
 
