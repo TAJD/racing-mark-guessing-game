@@ -10,7 +10,8 @@ import {
   evaluateGuess, 
   calculateStreakBonus,
   getTimeLimit,
-  generateStats
+  generateStats,
+  shuffleArray
 } from '../../utils/gameLogic';
 
 interface GameControllerProps {
@@ -79,11 +80,9 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         setGameEnded(true);
       } else {
         // Shuffle marks for true randomness each game
-        import('../../utils/gameLogic').then(({ shuffleArray }) => {
-          const shuffled = [...data];
-          shuffleArray(shuffled);
-          setMarks(shuffled);
-        });
+        const shuffled = [...data];
+        shuffleArray(shuffled);
+        setMarks(shuffled);
       }
     }).catch((err) => {
       console.error('Error loading racing marks:', err);

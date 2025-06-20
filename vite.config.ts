@@ -7,6 +7,18 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), cloudflare()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+            'react',
+            'react-dom'
+          ]
+        }
+      }
+    }
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
