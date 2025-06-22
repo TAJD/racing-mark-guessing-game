@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { GameState, GameConfig, RacingMark } from '../../types/game';
-import { OpenSeaMapContainer } from '../Map/OpenSeaMapContainer';
-import { MarkLegend } from '../Graphics/MarkIcons';
-import { GuessMode } from './GuessMode';
-import { ScoreDisplay } from './ScoreDisplay';
-import { getRacingMarks } from '../../data/marks';
-import { 
-  generateGuessQuestion, 
-  evaluateGuess, 
+import { useState, useEffect, useCallback } from "react";
+import type { GameState, GameConfig, RacingMark } from "../../types/game";
+import { OpenSeaMapContainer } from "../Map/OpenSeaMapContainer";
+import { MarkLegend } from "../Graphics/MarkIcons";
+import { GuessMode } from "./GuessMode";
+import { ScoreDisplay } from "./ScoreDisplay";
+import { getRacingMarks } from "../../data/marks";
+import {
+  generateGuessQuestion,
+  evaluateGuess,
   calculateStreakBonus,
   getTimeLimit,
   generateStats,
-  shuffleArray
-} from '../../utils/gameLogic';
+  shuffleArray,
+} from "../../utils/gameLogic";
 
 type Stats = {
   accuracy: number;
@@ -21,7 +21,7 @@ type Stats = {
   grade: string;
 };
 
-import type { GuessResult } from '../../types/game';
+import type { GuessResult } from "../../types/game";
 
 type LastResult = GuessResult & {
   streakBonus?: number;
@@ -36,12 +36,12 @@ interface GameControllerProps {
 
 export function GameController({ config, onGameEnd }: GameControllerProps) {
   const [gameState, setGameState] = useState<GameState>({
-    mode: 'guess',
+    mode: "guess",
     score: 0,
     streak: 0,
     totalQuestions: 0,
     correctAnswers: 0,
-    gameStartTime: Date.now()
+    gameStartTime: Date.now(),
   });
 
   const [currentQuestion, setCurrentQuestion] = useState<{
@@ -62,7 +62,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
   const generateNewQuestion = useCallback(async () => {
     try {
       if (!marks || !Array.isArray(marks) || marks.length === 0) {
-        console.error('No marks available for question generation:', marks);
+        console.error("No marks available for question generation:", marks);
         setGameEnded(true);
         return;
       }
@@ -82,27 +82,29 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
       setShowResult(false);
       setLastResult(undefined);
     } catch (error) {
-      console.error('Error generating question:', error);
+      console.error("Error generating question:", error);
       setGameEnded(true);
     }
   }, [config, marks]);
 
   // Load marks on mount
   useEffect(() => {
-    getRacingMarks().then((data) => {
-      if (!data || !Array.isArray(data) || data.length === 0) {
-        console.error('No racing marks loaded:', data);
+    getRacingMarks()
+      .then((data) => {
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          console.error("No racing marks loaded:", data);
+          setGameEnded(true);
+        } else {
+          // Shuffle marks for true randomness each game
+          const shuffled = [...data];
+          shuffleArray(shuffled);
+          setMarks(shuffled);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading racing marks:", err);
         setGameEnded(true);
-      } else {
-        // Shuffle marks for true randomness each game
-        const shuffled = [...data];
-        shuffleArray(shuffled);
-        setMarks(shuffled);
-      }
-    }).catch((err) => {
-      console.error('Error loading racing marks:', err);
-      setGameEnded(true);
-    });
+      });
   }, []);
 
   // Initialize first question when marks are loaded
@@ -118,27 +120,27 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     if (timeRemaining <= 0 || showResult || gameEnded) return;
 
     const timer = setInterval(() => {
-      setTimeRemaining(prev => {
+      setTimeRemaining((prev) => {
         if (prev <= 1) {
           // Handle timeout directly here to avoid stale closure issues
-          setGameState(currentState => {
+          setGameState((currentState) => {
             const newState = {
               ...currentState,
               totalQuestions: currentState.totalQuestions + 1,
-              streak: 0 // Reset streak on timeout
+              streak: 0, // Reset streak on timeout
             };
 
-              if (currentQuestion) {
-                setLastResult({
-                  isCorrect: false,
-                  points: 0,
-                  timeBonus: 0,
-                  streakBonus: 0,
-                  totalPoints: 0,
-                  correctMark: currentQuestion.targetMark,
-                  timeout: true
-                });
-              }
+            if (currentQuestion) {
+              setLastResult({
+                isCorrect: false,
+                points: 0,
+                timeBonus: 0,
+                streakBonus: 0,
+                totalPoints: 0,
+                correctMark: currentQuestion.targetMark,
+                timeout: true,
+              });
+            }
 
             setShowResult(true);
 
@@ -161,41 +163,45 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     return () => clearInterval(timer);
   }, [timeRemaining, showResult, gameEnded, currentQuestion, generateNewQuestion]);
 
-  const handleGuessAnswer = useCallback((selectedMark: RacingMark) => {
-    if (!currentQuestion || gameEnded) return;
+  const handleGuessAnswer = useCallback(
+    (selectedMark: RacingMark) => {
+      if (!currentQuestion || gameEnded) return;
 
-    const timeElapsed = (config.timeLimit || getTimeLimit(config.difficulty)) - timeRemaining;
-    const result = evaluateGuess(currentQuestion.targetMark, selectedMark, timeElapsed, config);
-    
-    setGameState(prev => {
-      // Add streak bonus
-      const streakBonus = result.isCorrect ? calculateStreakBonus(prev.streak + 1) : 0;
-      const totalPoints = result.points + streakBonus;
+      const timeElapsed = (config.timeLimit || getTimeLimit(config.difficulty)) - timeRemaining;
+      const result = evaluateGuess(currentQuestion.targetMark, selectedMark, timeElapsed, config);
 
-      const newState = {
-        ...prev,
-        score: prev.score + totalPoints,
-        streak: result.isCorrect ? prev.streak + 1 : 0,
-        totalQuestions: prev.totalQuestions + 1,
-        correctAnswers: prev.correctAnswers + (result.isCorrect ? 1 : 0),
-        lastAnswerTime: Date.now()
-      };
+      setGameState((prev) => {
+        // Add streak bonus
+        const streakBonus = result.isCorrect ? calculateStreakBonus(prev.streak + 1) : 0;
+        const totalPoints = result.points + streakBonus;
 
-      setLastResult({ ...result, streakBonus, totalPoints });
-      setShowResult(true);
+        const newState = {
+          ...prev,
+          score: prev.score + totalPoints,
+          streak: result.isCorrect ? prev.streak + 1 : 0,
+          totalQuestions: prev.totalQuestions + 1,
+          correctAnswers: prev.correctAnswers + (result.isCorrect ? 1 : 0),
+          lastAnswerTime: Date.now(),
+        };
 
-      // Auto-advance after showing result
-      setTimeout(() => {
-        if (newState.totalQuestions >= 10) { // End after 10 questions
-          setGameEnded(true);
-        } else {
-          generateNewQuestion();
-        }
-      }, 3000);
+        setLastResult({ ...result, streakBonus, totalPoints });
+        setShowResult(true);
 
-      return newState;
-    });
-  }, [currentQuestion, timeRemaining, config, gameEnded, generateNewQuestion]);
+        // Auto-advance after showing result
+        setTimeout(() => {
+          if (newState.totalQuestions >= 10) {
+            // End after 10 questions
+            setGameEnded(true);
+          } else {
+            generateNewQuestion();
+          }
+        }, 3000);
+
+        return newState;
+      });
+    },
+    [currentQuestion, timeRemaining, config, gameEnded, generateNewQuestion]
+  );
 
   // Handle final game end logic
   useEffect(() => {
@@ -222,23 +228,35 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
 
     const getGradeEmoji = (grade: string) => {
       switch (grade) {
-        case 'A+': return '🏆';
-        case 'A': return '🥇';
-        case 'B': return '🥈';
-        case 'C': return '🥉';
-        case 'D': return '📚';
-        default: return '💪';
+        case "A+":
+          return "🏆";
+        case "A":
+          return "🥇";
+        case "B":
+          return "🥈";
+        case "C":
+          return "🥉";
+        case "D":
+          return "📚";
+        default:
+          return "💪";
       }
     };
 
     const getGradeColor = (grade: string) => {
       switch (grade) {
-        case 'A+': return 'text-yellow-600';
-        case 'A': return 'text-yellow-500';
-        case 'B': return 'text-blue-600';
-        case 'C': return 'text-green-600';
-        case 'D': return 'text-orange-600';
-        default: return 'text-gray-600';
+        case "A+":
+          return "text-yellow-600";
+        case "A":
+          return "text-yellow-500";
+        case "B":
+          return "text-blue-600";
+        case "C":
+          return "text-green-600";
+        case "D":
+          return "text-orange-600";
+        default:
+          return "text-gray-600";
       }
     };
 
@@ -279,17 +297,19 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
                     <div className="text-2xl font-bold text-gray-800">{stats.accuracy}%</div>
                     <div className="text-xs text-gray-600">Accuracy</div>
                   </div>
-                  
+
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-800">{gameState.correctAnswers}/{gameState.totalQuestions}</div>
+                    <div className="text-2xl font-bold text-gray-800">
+                      {gameState.correctAnswers}/{gameState.totalQuestions}
+                    </div>
                     <div className="text-xs text-gray-600">Correct</div>
                   </div>
-                  
+
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <div className="text-2xl font-bold text-gray-800">{gameState.streak}</div>
                     <div className="text-xs text-gray-600">Best Streak</div>
                   </div>
-                  
+
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <div className="text-2xl font-bold text-gray-800">{stats.averageTime}s</div>
                     <div className="text-xs text-gray-600">Avg Time</div>
@@ -301,17 +321,23 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
                   {stats.accuracy >= 80 ? (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <div className="text-green-600 font-medium">🌟 Excellent Knowledge!</div>
-                      <div className="text-sm text-green-600">You really know the Solent racing marks!</div>
+                      <div className="text-sm text-green-600">
+                        You really know the Solent racing marks!
+                      </div>
                     </div>
                   ) : stats.accuracy >= 60 ? (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <div className="text-blue-600 font-medium">👍 Good Progress!</div>
-                      <div className="text-sm text-blue-600">Keep practicing to improve your knowledge.</div>
+                      <div className="text-sm text-blue-600">
+                        Keep practicing to improve your knowledge.
+                      </div>
                     </div>
                   ) : (
                     <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
                       <div className="text-orange-600 font-medium">💪 Keep Learning!</div>
-                      <div className="text-sm text-orange-600">More practice will help you master these marks.</div>
+                      <div className="text-sm text-orange-600">
+                        More practice will help you master these marks.
+                      </div>
                     </div>
                   )}
                 </div>
@@ -324,12 +350,15 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
                   >
                     🔄 Play Again
                   </button>
-                  
+
                   <button
                     onClick={() => {
                       const text = `I just scored ${gameState.score} points with ${stats.accuracy}% accuracy on the Solent Racing Mark Game! 🏆 #SolentSailing`;
                       const url = encodeURIComponent(window.location.href);
-                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`, '_blank');
+                      window.open(
+                        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`,
+                        "_blank"
+                      );
                     }}
                     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors border border-gray-300"
                   >
@@ -373,15 +402,15 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         <div className="md:hidden">
           {/* Map Section - Full width on mobile */}
           <div className="bg-white mt-[64px]">
-                <OpenSeaMapContainer
-                  marks={visibleMarks}
-                  center={mapCenter}
-                  zoom={mapZoom}
-                  highlightedMark={currentQuestion.targetMark.id}
-                  hiddenMarks={hiddenMarks}
-                  className="h-[50vh] min-h-[300px]"
-                  openSeaMapEnabled={config.openSeaMapEnabled}
-                />
+            <OpenSeaMapContainer
+              marks={visibleMarks}
+              center={mapCenter}
+              zoom={mapZoom}
+              highlightedMark={currentQuestion.targetMark.id}
+              hiddenMarks={hiddenMarks}
+              className="h-[50vh] min-h-[300px]"
+              openSeaMapEnabled={config.openSeaMapEnabled}
+            />
           </div>
 
           {/* Game Panel - Bottom sheet style */}

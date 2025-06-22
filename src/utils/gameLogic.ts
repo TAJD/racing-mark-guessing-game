@@ -1,5 +1,5 @@
-import type { RacingMark, GameConfig, GuessResult } from '../types/game';
-import { calculateDistance, findNearbyMarks, getMarksByDifficulty } from './gpxParser';
+import type { RacingMark, GameConfig, GuessResult } from "../types/game";
+import { calculateDistance, findNearbyMarks, getMarksByDifficulty } from "./gpxParser";
 
 // Generate a guess-the-mark question
 export function generateGuessQuestion(
@@ -7,37 +7,42 @@ export function generateGuessQuestion(
   config: GameConfig
 ): { targetMark: RacingMark; options: RacingMark[]; contextMarks: RacingMark[] } {
   const availableMarks = getMarksByDifficulty(marks, config.difficulty);
-  
+
   if (availableMarks.length < config.numberOfOptions) {
-    throw new Error('Not enough marks available for this difficulty level');
+    throw new Error("Not enough marks available for this difficulty level");
   }
 
   // Select a random target mark
   const targetMark = availableMarks[Math.floor(Math.random() * availableMarks.length)];
-  
+
   // Find nearby marks for context (within 2km)
   const contextMarks = findNearbyMarks(targetMark, marks, 2000);
-  
+
   // Generate wrong options - ensure at least one mark of the same type is included
   const wrongOptions: RacingMark[] = [];
   const usedIds = new Set([targetMark.id]);
-  
+
   // Check if we have enough total marks for the requested number of options
-  const totalAvailableMarks = marks.filter(mark => !usedIds.has(mark.id));
+  const totalAvailableMarks = marks.filter((mark) => !usedIds.has(mark.id));
   if (totalAvailableMarks.length < config.numberOfOptions - 1) {
-    throw new Error('Not enough marks available for this number of options');
+    throw new Error("Not enough marks available for this number of options");
   }
-  
+
   // First, find marks with the same symbol as the target (to make it harder)
-  const sameTypeMarks = marks.filter(mark => 
-    !usedIds.has(mark.id) && mark.symbol === targetMark.symbol
+  const sameTypeMarks = marks.filter(
+    (mark) => !usedIds.has(mark.id) && mark.symbol === targetMark.symbol
   );
-  
+
   // Add at least one mark of the same type if available
   if (sameTypeMarks.length > 0) {
     // Select the nearest mark of the same type
     let nearestSameType = sameTypeMarks[0];
-    let minDistance = calculateDistance(targetMark.lat, targetMark.lon, nearestSameType.lat, nearestSameType.lon);
+    let minDistance = calculateDistance(
+      targetMark.lat,
+      targetMark.lon,
+      nearestSameType.lat,
+      nearestSameType.lon
+    );
     for (const mark of sameTypeMarks) {
       const dist = calculateDistance(targetMark.lat, targetMark.lon, mark.lat, mark.lon);
       if (dist < minDistance) {
@@ -48,16 +53,14 @@ export function generateGuessQuestion(
     wrongOptions.push(nearestSameType);
     usedIds.add(nearestSameType.id);
   }
-  
+
   // Fill remaining slots by prioritizing marks at a reasonable distance
   const remainingSlots = config.numberOfOptions - 1 - wrongOptions.length;
   if (remainingSlots > 0) {
     const goodDistanceOptions: RacingMark[] = [];
     const fallbackOptions: RacingMark[] = [];
     // Exclude other same-type marks from remaining options
-    const allOtherMarks = marks.filter(
-      mark => !usedIds.has(mark.id)
-    );
+    const allOtherMarks = marks.filter((mark) => !usedIds.has(mark.id));
 
     // Separate marks into preferred and fallback lists
     for (const mark of allOtherMarks) {
@@ -83,11 +86,11 @@ export function generateGuessQuestion(
       }
     }
   }
-  
+
   // Combine target and wrong options, then shuffle
   const options = [targetMark, ...wrongOptions];
   shuffleArray(options);
-  
+
   return { targetMark, options, contextMarks };
 }
 
@@ -99,17 +102,17 @@ export function evaluateGuess(
   config: GameConfig
 ): GuessResult {
   const isCorrect = targetMark.id === selectedMark.id;
-  
+
   // Base points for correct answer
   let points = isCorrect ? 100 : 0;
-  
+
   // Time bonus based on difficulty and time left
   let timeBonus = 0;
   if (isCorrect && config.timeLimit) {
     const maxBonusByDifficulty = {
       beginner: 30,
       intermediate: 50,
-      advanced: 70
+      advanced: 70,
     };
     const maxBonus = maxBonusByDifficulty[config.difficulty] ?? 30;
     const timeLeft = Math.max(0, config.timeLimit - timeElapsed);
@@ -117,25 +120,24 @@ export function evaluateGuess(
     timeBonus = Math.floor(timeRatio * maxBonus);
     points += timeBonus;
   }
-  
+
   // Difficulty multiplier
   const difficultyMultiplier = {
     beginner: 1,
     intermediate: 1.5,
-    advanced: 2
+    advanced: 2,
   }[config.difficulty];
-  
+
   points = Math.floor(points * difficultyMultiplier);
-  
+
   return {
     isCorrect,
     points,
     timeBonus,
     correctMark: targetMark,
-    selectedMark
+    selectedMark,
   };
 }
-
 
 // Get hint for a mark (progressive difficulty)
 export function getMarkHint(mark: RacingMark, hintLevel: number): string {
@@ -144,22 +146,22 @@ export function getMarkHint(mark: RacingMark, hintLevel: number): string {
     `Look for a ${mark.symbol} colored mark.`,
     `The mark is named "${mark.name.trim()}".`,
     `Description: ${mark.description}`,
-    mark.sponsor ? `Sponsored by: ${mark.sponsor}` : 'This is a navigation mark.'
+    mark.sponsor ? `Sponsored by: ${mark.sponsor}` : "This is a navigation mark.",
   ];
-  
+
   return hints[Math.min(hintLevel, hints.length - 1)];
 }
 
 // Get general area description based on coordinates
 function getGeneralArea(mark: RacingMark): string {
   const { lat, lon } = mark;
-  
+
   // Very rough geographical areas of the Solent
-  if (lon < -1.6) return 'western';
-  if (lon > -1.1) return 'eastern';
-  if (lat > 50.8) return 'northern';
-  if (lat < 50.7) return 'southern';
-  return 'central';
+  if (lon < -1.6) return "western";
+  if (lon > -1.1) return "eastern";
+  if (lat > 50.8) return "northern";
+  if (lat < 50.7) return "southern";
+  return "central";
 }
 
 // Utility function to shuffle an array
@@ -177,12 +179,16 @@ export function calculateStreakBonus(streak: number): number {
 }
 
 // Get difficulty-appropriate time limit
-export function getTimeLimit(difficulty: GameConfig['difficulty']): number {
+export function getTimeLimit(difficulty: GameConfig["difficulty"]): number {
   switch (difficulty) {
-    case 'beginner': return 30; // 30 seconds
-    case 'intermediate': return 20; // 20 seconds
-    case 'advanced': return 10; // 10 seconds
-    default: return 30;
+    case "beginner":
+      return 30; // 30 seconds
+    case "intermediate":
+      return 20; // 20 seconds
+    case "advanced":
+      return 10; // 10 seconds
+    default:
+      return 30;
   }
 }
 
@@ -201,17 +207,17 @@ export function generateStats(
   const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
   const averageTime = totalQuestions > 0 ? gameTime / totalQuestions : 0;
   const pointsPerMinute = gameTime > 0 ? (totalPoints / gameTime) * 60 : 0;
-  
-  let grade = 'F';
-  if (accuracy >= 90) grade = 'A';
-  else if (accuracy >= 80) grade = 'B';
-  else if (accuracy >= 70) grade = 'C';
-  else if (accuracy >= 60) grade = 'D';
-  
+
+  let grade = "F";
+  if (accuracy >= 90) grade = "A";
+  else if (accuracy >= 80) grade = "B";
+  else if (accuracy >= 70) grade = "C";
+  else if (accuracy >= 60) grade = "D";
+
   return {
     accuracy: Math.round(accuracy),
     averageTime: Math.round(averageTime),
     pointsPerMinute: Math.round(pointsPerMinute),
-    grade
+    grade,
   };
 }

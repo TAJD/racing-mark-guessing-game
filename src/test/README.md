@@ -5,7 +5,9 @@ This project uses **Vitest** as the testing framework, which is a lightweight, f
 ## Test Structure
 
 ### Unit Tests
+
 - **`src/utils/__tests__/gameLogic.test.ts`** - Tests for game logic functions including:
+
   - Question generation for guess and place modes
   - Answer evaluation and scoring
   - Streak bonuses and statistics calculation
@@ -19,6 +21,7 @@ This project uses **Vitest** as the testing framework, which is a lightweight, f
   - Nearby mark detection
 
 ### Component Tests
+
 - **`src/components/__tests__/ScoreDisplay.test.tsx`** - Tests for React components including:
   - Score rendering
   - Streak display
@@ -42,6 +45,7 @@ pnpm test:ui
 ### Test Configuration
 
 Tests are configured in `vite.config.ts` with the following setup:
+
 - **Environment**: jsdom (for DOM testing)
 - **Globals**: Enabled (no need to import `describe`, `it`, `expect`)
 - **Setup**: `src/test/setup.ts` (includes testing-library extensions)
@@ -49,6 +53,7 @@ Tests are configured in `vite.config.ts` with the following setup:
 ### Setup File
 
 The `src/test/setup.ts` file includes:
+
 - `@testing-library/jest-dom` matchers for enhanced assertions
 - Mocks for browser APIs not available in jsdom:
   - `matchMedia` - Required for responsive design tests
@@ -57,18 +62,21 @@ The `src/test/setup.ts` file includes:
 ## Testing Best Practices
 
 ### Utility Functions
+
 - Test pure functions with various input scenarios
 - Include edge cases (empty arrays, null values, extreme numbers)
 - Test error conditions and boundary values
 - Verify mathematical calculations with known inputs/outputs
 
 ### React Components
+
 - Test component rendering with different props
 - Verify user interactions using `@testing-library/user-event`
 - Test accessibility features and ARIA attributes
 - Mock external dependencies (APIs, complex child components)
 
 ### Game Logic
+
 - Test scoring algorithms with various difficulty levels
 - Verify random generation produces valid results
 - Test time-based features with controlled time values
@@ -77,6 +85,7 @@ The `src/test/setup.ts` file includes:
 ## Test Coverage
 
 The test suite covers:
+
 - ✅ Core game logic functions
 - ✅ GPX data parsing and validation
 - ✅ Distance calculations and geographical utilities
@@ -84,6 +93,7 @@ The test suite covers:
 - ✅ Scoring and evaluation algorithms
 
 ### Areas for Future Testing
+
 - User interaction flows (clicking, dragging on map)
 - Game state management and transitions
 - Error handling and recovery
@@ -93,11 +103,13 @@ The test suite covers:
 ## Debugging Tests
 
 ### VS Code Integration
+
 - Install the "Vitest" VS Code extension for inline test results
 - Use the Test Explorer panel to run individual tests
 - Set breakpoints in test files for debugging
 
 ### Command Line Debugging
+
 ```bash
 # Run specific test file
 pnpm test gameLogic.test.ts
@@ -112,13 +124,15 @@ pnpm test --reporter=verbose
 ## Mocking Guidelines
 
 ### External APIs
+
 ```typescript
 // Mock fetch for API calls
-vi.mock('fetch')
-const mockFetch = vi.mocked(fetch)
+vi.mock("fetch");
+const mockFetch = vi.mocked(fetch);
 ```
 
 ### React Components
+
 ```typescript
 // Mock heavy components like maps
 vi.mock('../Map/OpenSeaMapContainer', () => ({
@@ -127,15 +141,17 @@ vi.mock('../Map/OpenSeaMapContainer', () => ({
 ```
 
 ### Browser APIs
+
 Most browser API mocks are already set up in `setup.ts`, but you can add more:
+
 ```typescript
 // Mock geolocation
-Object.defineProperty(navigator, 'geolocation', {
+Object.defineProperty(navigator, "geolocation", {
   value: {
     getCurrentPosition: vi.fn(),
-    watchPosition: vi.fn()
-  }
-})
+    watchPosition: vi.fn(),
+  },
+});
 ```
 
 ## Continuous Integration
