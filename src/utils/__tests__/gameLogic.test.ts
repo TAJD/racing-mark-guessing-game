@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import * as gameLogic from '../gameLogic'
 import {
   generateGuessQuestion,
   evaluateGuess,
@@ -97,6 +98,62 @@ describe('gameLogic', () => {
       const result = generateGuessQuestion(mockMarks, defaultConfig)
       
       expect(result.options.some(option => option.id === result.targetMark.id)).toBe(true)
+    })
+
+    it('should select the nearest same-type mark as a wrong option', () => {
+      // Use only allowed MarkSymbol values
+      type MarkSymbol = 'Y' | 'G' | 'R' | 'B';
+      const target = {
+        id: 'target',
+        name: 'Target Racing Buoy',
+        lat: 50.7800,
+        lon: -1.2500,
+        symbol: 'R' as MarkSymbol,
+        description: 'Target mark',
+        sponsor: 'Sponsor'
+      };
+      const nearSameType = {
+        id: 'near',
+        name: 'Near Racing Buoy',
+        lat: 50.7801,
+        lon: -1.2501,
+        symbol: 'R' as MarkSymbol,
+        description: 'Near same type',
+        sponsor: 'Sponsor'
+      };
+      const farSameType = {
+        id: 'far',
+        name: 'Far Racing Buoy',
+        lat: 50.8000,
+        lon: -1.2000,
+        symbol: 'R' as MarkSymbol,
+        description: 'Far same type',
+        sponsor: 'Sponsor'
+      };
+      const unrelated = {
+        id: 'other',
+        name: 'Other Mark',
+        lat: 50.7000,
+        lon: -1.3000,
+        symbol: 'G' as MarkSymbol,
+        description: 'Other type',
+        sponsor: undefined
+      };
+      const marks = [target, nearSameType, farSameType, unrelated];
+      const config = { ...defaultConfig, numberOfOptions: 3 };
+      // Run multiple times to ensure target is selected at least once
+      let found = false;
+      for (let i = 0; i < 10; i++) {
+        const { targetMark, options } = gameLogic.generateGuessQuestion(marks, config);
+        if (targetMark.id === target.id) {
+          found = true;
+          // The nearest same-type mark should be included in options
+          expect(options.some(opt => opt.id === nearSameType.id)).toBe(true);
+          // The farther same-type mark should not be included if only one same-type is allowed
+          expect(options.some(opt => opt.id === farSameType.id)).toBe(false);
+        }
+      }
+      expect(found).toBe(true);
     })
   })
 

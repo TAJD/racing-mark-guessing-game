@@ -35,9 +35,18 @@ export function generateGuessQuestion(
   
   // Add at least one mark of the same type if available
   if (sameTypeMarks.length > 0) {
-    const randomSameType = sameTypeMarks[Math.floor(Math.random() * sameTypeMarks.length)];
-    wrongOptions.push(randomSameType);
-    usedIds.add(randomSameType.id);
+    // Select the nearest mark of the same type
+    let nearestSameType = sameTypeMarks[0];
+    let minDistance = calculateDistance(targetMark.lat, targetMark.lon, nearestSameType.lat, nearestSameType.lon);
+    for (const mark of sameTypeMarks) {
+      const dist = calculateDistance(targetMark.lat, targetMark.lon, mark.lat, mark.lon);
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearestSameType = mark;
+      }
+    }
+    wrongOptions.push(nearestSameType);
+    usedIds.add(nearestSameType.id);
   }
   
   // Fill remaining slots by prioritizing marks at a reasonable distance

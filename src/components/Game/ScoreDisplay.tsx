@@ -37,19 +37,19 @@ export function ScoreDisplay({ gameState, timeRemaining }: ScoreDisplayProps) {
       <div className="flex items-center justify-between gap-3 md:hidden">
         <div className="flex items-center gap-4">
           <div className="text-center">
-            <div className="text-xs text-gray-500">Score</div>
-            <div className="font-bold text-lg text-blue-600">{gameState.score}</div>
+            <div className="text-xs text-gray-500" data-testid="score-label">Score</div>
+            <div className="font-bold text-lg text-blue-600" data-testid="score-value">{gameState.score}</div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500">Question</div>
-            <div className="font-semibold text-sm">{gameState.totalQuestions + 1}/10</div>
+            <div className="text-xs text-gray-500" data-testid="question-label">Question</div>
+            <div className="font-semibold text-sm" data-testid="question-progress">{gameState.totalQuestions + 1}/10</div>
           </div>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="text-center">
-            <div className="text-xs text-gray-500">Time</div>
-            <div className={`font-mono font-bold ${getTimeColor(timeRemaining)}`}>
+            <div className="text-xs text-gray-500" data-testid="time-label">Time</div>
+            <div className={`font-mono font-bold ${getTimeColor(timeRemaining)}`} data-testid="time-value">
               {formatTime(timeRemaining)}
             </div>
           </div>
@@ -74,30 +74,36 @@ export function ScoreDisplay({ gameState, timeRemaining }: ScoreDisplayProps) {
       {/* Desktop horizontal layout */}
       <div className="hidden md:flex md:items-center md:gap-6 md:text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">Score:</span>
-          <span className="font-bold text-lg text-blue-600">{gameState.score}</span>
+          <span className="text-gray-600" data-testid="score-label-inline">Score:</span>
+          <span className="font-bold text-lg text-blue-600" data-testid="score-value-inline">{gameState.score}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-600" data-testid="mode-label">Mode:</span>
+          <span className="font-semibold" data-testid="mode-value">
+            {gameState.mode === 'guess' ? '🔍 Guess' : gameState.mode}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">Question:</span>
-          <span className="font-semibold">{gameState.totalQuestions + 1}/10</span>
+          <span className="text-gray-600" data-testid="question-label-inline">Question:</span>
+          <span className="font-semibold" data-testid="question-progress-inline">{gameState.totalQuestions + 1}/10</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">Accuracy:</span>
-          <span className="font-semibold">{accuracy}%</span>
+          <span className="text-gray-600" data-testid="accuracy-label">Accuracy:</span>
+          <span className="font-semibold" data-testid="accuracy-value">{accuracy}%</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">Streak:</span>
-          <span className={`font-semibold ${getStreakColor(gameState.streak)}`}>
+          <span className="text-gray-600" data-testid="streak-label">Streak:</span>
+          <span className={`font-semibold ${getStreakColor(gameState.streak)}`} data-testid="streak-value">
             {gameState.streak}{gameState.streak >= 3 && ' 🔥'}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600">Time:</span>
-          <span className={`font-mono font-bold text-lg ${getTimeColor(timeRemaining)}`}>
+          <span className="text-gray-600" data-testid="time-label-inline">Time:</span>
+          <span className={`font-mono font-bold text-lg ${getTimeColor(timeRemaining)}`} data-testid="time-value-inline">
             {formatTime(timeRemaining)}
           </span>
         </div>
@@ -107,13 +113,13 @@ export function ScoreDisplay({ gameState, timeRemaining }: ScoreDisplayProps) {
       {showDetails && (
         <div className="md:hidden mt-3 pt-3 border-t border-gray-200 grid grid-cols-2 gap-3 text-sm">
           <div className="text-center p-2 bg-gray-50 rounded">
-            <div className="text-xs text-gray-500 mb-1">Accuracy</div>
-            <div className="font-semibold">{accuracy}%</div>
+            <div className="text-xs text-gray-500 mb-1" data-testid="accuracy-label-section">Accuracy</div>
+            <div className="font-semibold" data-testid="accuracy-value-section">{accuracy}%</div>
           </div>
           
           <div className="text-center p-2 bg-gray-50 rounded">
-            <div className="text-xs text-gray-500 mb-1">Streak</div>
-            <div className={`font-semibold ${getStreakColor(gameState.streak)}`}>
+            <div className="text-xs text-gray-500 mb-1" data-testid="streak-label-section">Streak</div>
+            <div className={`font-semibold ${getStreakColor(gameState.streak)}`} data-testid="streak-value-section">
               {gameState.streak}{gameState.streak >= 3 && ' 🔥'}
             </div>
           </div>
