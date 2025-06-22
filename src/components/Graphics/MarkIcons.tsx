@@ -1,4 +1,4 @@
-import type { MarkSymbol } from '../../types/game';
+import type { MarkSymbol } from "../../types/game";
 
 interface MarkIconProps {
   symbol: MarkSymbol;
@@ -6,7 +6,7 @@ interface MarkIconProps {
   className?: string;
 }
 
-export function MarkIcon({ symbol, size = 20, className = '' }: MarkIconProps) {
+export function MarkIcon({ symbol, size = 20, className = "" }: MarkIconProps) {
   // Helper to render a banded cylinder for cardinal/safe water marks
   const renderBandedCylinder = (bands: { color: string; height: number }[]) => {
     let y = 4;
@@ -29,21 +29,13 @@ export function MarkIcon({ symbol, size = 20, className = '' }: MarkIconProps) {
           return rect;
         })}
         {/* Outline */}
-        <rect
-          x="8"
-          y="4"
-          width="8"
-          height="16"
-          fill="none"
-          stroke="#374151"
-          strokeWidth="1"
-        />
+        <rect x="8" y="4" width="8" height="16" fill="none" stroke="#374151" strokeWidth="1" />
       </>
     );
   };
 
   // Special cases for banded marks
-  if (symbol === 'RW') {
+  if (symbol === "RW") {
     // Safe Water: vertical red/white stripes
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
@@ -57,70 +49,58 @@ export function MarkIcon({ symbol, size = 20, className = '' }: MarkIconProps) {
       </svg>
     );
   }
-  if (symbol === 'YBY') {
+  if (symbol === "YBY") {
     // West Cardinal: yellow-black-yellow horizontal bands
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
         {renderBandedCylinder([
-          { color: '#ca8a04', height: 5.33 },
-          { color: '#000', height: 5.33 },
-          { color: '#ca8a04', height: 5.34 },
+          { color: "#ca8a04", height: 5.33 },
+          { color: "#000", height: 5.33 },
+          { color: "#ca8a04", height: 5.34 },
         ])}
       </svg>
     );
   }
-  if (symbol === 'BYB') {
+  if (symbol === "BYB") {
     // East Cardinal: black-yellow-black horizontal bands
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
         {renderBandedCylinder([
-          { color: '#000', height: 5.33 },
-          { color: '#ca8a04', height: 5.33 },
-          { color: '#000', height: 5.34 },
+          { color: "#000", height: 5.33 },
+          { color: "#ca8a04", height: 5.33 },
+          { color: "#000", height: 5.34 },
         ])}
       </svg>
     );
   }
-  if (symbol === 'BY') {
+  if (symbol === "BY") {
     // North Cardinal: black over yellow
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
         {renderBandedCylinder([
-          { color: '#000', height: 8 },
-          { color: '#ca8a04', height: 8 },
+          { color: "#000", height: 8 },
+          { color: "#ca8a04", height: 8 },
         ])}
       </svg>
     );
   }
-  if (symbol === 'YB') {
+  if (symbol === "YB") {
     // South Cardinal: yellow over black
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
         {renderBandedCylinder([
-          { color: '#ca8a04', height: 8 },
-          { color: '#000', height: 8 },
+          { color: "#ca8a04", height: 8 },
+          { color: "#000", height: 8 },
         ])}
       </svg>
     );
   }
 
   // Special case for 'Y' symbol - render as yellow circle
-  if (symbol === 'Y') {
+  if (symbol === "Y") {
     return (
-      <svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 24 24" 
-        className={className}
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          fill="#ca8a04"
-          stroke="#374151"
-          strokeWidth="1"
-        />
+      <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
+        <circle cx="12" cy="12" r="10" fill="#ca8a04" stroke="#374151" strokeWidth="1" />
       </svg>
     );
   }
@@ -128,30 +108,21 @@ export function MarkIcon({ symbol, size = 20, className = '' }: MarkIconProps) {
   // Default: solid color cylinder
   const color = (() => {
     switch (symbol) {
-      case 'R': return '#dc2626';
-      case 'G': return '#16a34a';
-      case 'B': return '#2563eb';
-      default: return '#ca8a04';
+      case "R":
+        return "#dc2626";
+      case "G":
+        return "#16a34a";
+      case "B":
+        return "#2563eb";
+      default:
+        return "#ca8a04";
     }
   })();
 
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      className={className}
-    >
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
       {/* Cylinder shape */}
-      <rect
-        x="8"
-        y="4"
-        width="8"
-        height="16"
-        fill={color}
-        stroke="#374151"
-        strokeWidth="1"
-      />
+      <rect x="8" y="4" width="8" height="16" fill={color} stroke="#374151" strokeWidth="1" />
     </svg>
   );
 }
@@ -160,17 +131,17 @@ interface MarkLegendProps {
   className?: string;
 }
 
-export function MarkLegend({ className = '' }: MarkLegendProps) {
+export function MarkLegend({ className = "" }: MarkLegendProps) {
   const markTypes: { symbol: MarkSymbol; description: string }[] = [
-    { symbol: 'R', description: 'Port Hand Mark' },
-    { symbol: 'G', description: 'Starboard Hand Mark' },
-    { symbol: 'Y', description: 'Special Mark' },
-    { symbol: 'B', description: 'Blue Mark' },
-    { symbol: 'RW', description: 'Safe Water Mark' },
-    { symbol: 'YBY', description: 'West Cardinal Mark' },
-    { symbol: 'BYB', description: 'East Cardinal Mark' },
-    { symbol: 'BY', description: 'North Cardinal Mark' },
-    { symbol: 'YB', description: 'South Cardinal Mark' },
+    { symbol: "R", description: "Port Hand Mark" },
+    { symbol: "G", description: "Starboard Hand Mark" },
+    { symbol: "Y", description: "Special Mark" },
+    { symbol: "B", description: "Blue Mark" },
+    { symbol: "RW", description: "Safe Water Mark" },
+    { symbol: "YBY", description: "West Cardinal Mark" },
+    { symbol: "BYB", description: "East Cardinal Mark" },
+    { symbol: "BY", description: "North Cardinal Mark" },
+    { symbol: "YB", description: "South Cardinal Mark" },
   ];
 
   return (

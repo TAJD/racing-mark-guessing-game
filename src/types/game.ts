@@ -1,4 +1,4 @@
-export type MarkSymbol = 'R' | 'G' | 'Y' | 'B' | 'RW' | 'YBY' | 'BYB' | 'BY' | 'YB';
+export type MarkSymbol = "R" | "G" | "Y" | "B" | "RW" | "YBY" | "BYB" | "BY" | "YB";
 
 export interface RacingMark {
   id: string;
@@ -12,7 +12,7 @@ export interface RacingMark {
 }
 
 export interface GameState {
-  mode: 'guess';
+  mode: "guess";
   currentMark?: RacingMark;
   options?: RacingMark[];
   score: number;
@@ -24,7 +24,7 @@ export interface GameState {
 }
 
 export interface GameConfig {
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  difficulty: "beginner" | "intermediate" | "advanced";
   numberOfOptions: number;
   timeLimit?: number;
   hintEnabled: boolean;

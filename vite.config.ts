@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 
@@ -11,19 +11,16 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: [
-            'react',
-            'react-dom'
-          ]
-        }
-      }
-    }
+          vendor: ["react", "react-dom"],
+        },
+      },
+    },
   },
   test: {
     globals: true,
-    environment: 'happy-dom',
-    setupFiles: './src/test/setup.ts',
-    pool: 'threads',
+    environment: "happy-dom",
+    setupFiles: "./src/test/setup.ts",
+    pool: "threads",
     poolOptions: {
       threads: {
         singleThread: true,
@@ -32,9 +29,9 @@ export default defineConfig({
     teardownTimeout: 1000,
     testTimeout: 10000,
     hookTimeout: 10000,
-    reporters: ['default'],
+    reporters: ["default"],
     logHeapUsage: true,
     isolate: false,
-    forceRerunTriggers: ['**/vite.config.*', '**/vitest.config.*'],
+    forceRerunTriggers: ["**/vite.config.*", "**/vitest.config.*"],
   },
-})
+});
