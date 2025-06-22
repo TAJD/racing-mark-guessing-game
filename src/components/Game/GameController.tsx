@@ -14,9 +14,24 @@ import {
   shuffleArray
 } from '../../utils/gameLogic';
 
+type Stats = {
+  accuracy: number;
+  averageTime: number;
+  pointsPerMinute: number;
+  grade: string;
+};
+
+import type { GuessResult } from '../../types/game';
+
+type LastResult = GuessResult & {
+  streakBonus?: number;
+  totalPoints?: number;
+  timeout?: boolean;
+};
+
 interface GameControllerProps {
   config: GameConfig;
-  onGameEnd?: (finalScore: number, stats: any) => void;
+  onGameEnd?: (finalScore: number, stats: Stats) => void;
 }
 
 export function GameController({ config, onGameEnd }: GameControllerProps) {
@@ -37,7 +52,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
 
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [showResult, setShowResult] = useState(false);
-  const [lastResult, setLastResult] = useState<any>(null);
+  const [lastResult, setLastResult] = useState<LastResult | undefined>(undefined);
   const [gameEnded, setGameEnded] = useState(false);
   const [mapCenter, setMapCenter] = useState<[number, number]>([50.75, -1.3]);
   const [mapZoom, setMapZoom] = useState(11);
@@ -65,7 +80,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
 
       setTimeRemaining(config.timeLimit || getTimeLimit(config.difficulty));
       setShowResult(false);
-      setLastResult(null);
+      setLastResult(undefined);
     } catch (error) {
       console.error('Error generating question:', error);
       setGameEnded(true);
@@ -96,7 +111,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
       generateNewQuestion();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marks, generateNewQuestion]);
+  }, [marks, generateNewQuestion, config.openSeaMapEnabled]);
 
   // Timer effect
   useEffect(() => {
@@ -113,15 +128,17 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
               streak: 0 // Reset streak on timeout
             };
 
-            setLastResult({
-              isCorrect: false,
-              points: 0,
-              timeBonus: 0,
-              streakBonus: 0,
-              totalPoints: 0,
-              correctMark: currentQuestion?.targetMark,
-              timeout: true
-            });
+              if (currentQuestion) {
+                setLastResult({
+                  isCorrect: false,
+                  points: 0,
+                  timeBonus: 0,
+                  streakBonus: 0,
+                  totalPoints: 0,
+                  correctMark: currentQuestion.targetMark,
+                  timeout: true
+                });
+              }
 
             setShowResult(true);
 

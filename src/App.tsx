@@ -18,7 +18,13 @@ function App() {
     setGameStarted(true)
   }
 
-  const handleGameEnd = (finalScore: number, stats: any) => {
+  type Stats = {
+    accuracy: number;
+    averageTime: number;
+    pointsPerMinute: number;
+    grade: string;
+  };
+  const handleGameEnd = (finalScore: number, stats: Stats) => {
     console.log('Game ended with score:', finalScore, 'Stats:', stats)
     // Could save to local storage or send to API
   }

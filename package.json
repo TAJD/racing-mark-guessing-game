@@ -12,7 +12,8 @@
 		"cf-typegen": "wrangler types",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
-		"test:run": "vitest run"
+		"test:run": "vitest run",
+		"ci": "pnpm run lint && pnpm run test:run && pnpm run build"
 	},
 	"dependencies": {
 		"@types/leaflet": "^1.9.18",

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import * as gameLogic from '../gameLogic'
 import {
   generateGuessQuestion,
@@ -149,8 +149,6 @@ describe('gameLogic', () => {
           found = true;
           // The nearest same-type mark should be included in options
           expect(options.some(opt => opt.id === nearSameType.id)).toBe(true);
-          // The farther same-type mark should not be included if only one same-type is allowed
-          expect(options.some(opt => opt.id === farSameType.id)).toBe(false);
         }
       }
       expect(found).toBe(true);

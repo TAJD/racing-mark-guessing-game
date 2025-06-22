@@ -64,8 +64,7 @@ export function OpenSeaMapContainer({
 
     // Render MarkIcon as static markup and ensure SVG has xmlns attribute
     let iconSvg = ReactDOMServer.renderToStaticMarkup(
-      // @ts-ignore
-      <MarkIcon symbol={mark.symbol} size={size} />
+    <MarkIcon symbol={mark.symbol} size={size} />
     );
     if (!iconSvg.includes('xmlns="http://www.w3.org/2000/svg"')) {
       iconSvg = iconSvg.replace(
