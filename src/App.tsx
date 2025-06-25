@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { GameController } from "./components/Game/GameController";
 import type { GameConfig } from "./types/game";
 import { getTimeLimit } from "./utils/gameLogic";
@@ -6,17 +6,45 @@ import "./App.css";
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
-  const [gameConfig, setGameConfig] = useState<GameConfig>({
-    difficulty: "beginner",
-    numberOfOptions: 5,
-    timeLimit: getTimeLimit("beginner"),
-    hintEnabled: false, // changed from true to false
-    openSeaMapEnabled: false,
-  });
+
+  // Load cached config from localStorage if present
+  const getInitialConfig = (): GameConfig => {
+    const cached = localStorage.getItem("gameConfig");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        // Ensure timeLimit is set based on difficulty if missing
+        if (!parsed.timeLimit && parsed.difficulty) {
+          parsed.timeLimit = getTimeLimit(parsed.difficulty);
+        }
+        return parsed;
+      } catch {
+        // Fallback to default if parsing fails
+      }
+    }
+    return {
+      difficulty: "beginner",
+      numberOfOptions: 5,
+      timeLimit: getTimeLimit("beginner"),
+      hintEnabled: false,
+      openSeaMapEnabled: false,
+    };
+  };
+
+  const [gameConfig, setGameConfig] = useState<GameConfig>(getInitialConfig());
 
   const handleGameStart = () => {
     setGameStarted(true);
   };
+
+  // Save config to localStorage on change
+  // Only cache before game starts
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(() => {
+    if (!gameStarted) {
+      localStorage.setItem("gameConfig", JSON.stringify(gameConfig));
+    }
+  }, [gameConfig, gameStarted]);
 
   type Stats = {
     accuracy: number;
