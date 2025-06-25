@@ -5,11 +5,13 @@ import { calculateDistance, findNearbyMarks, getMarksByDifficulty } from "./gpxP
 export function generateGuessQuestion(
   marks: RacingMark[],
   config: GameConfig,
-  usedMarkIds: Set<string>
+  usedMarkIds?: Set<string>
 ): { targetMark: RacingMark; options: RacingMark[]; contextMarks: RacingMark[] } {
+  // Default to a new Set if not provided
+  const usedSet = usedMarkIds ?? new Set<string>();
   // Only use marks that haven't been used yet
   const availableMarks = getMarksByDifficulty(marks, config.difficulty).filter(
-    (mark) => !usedMarkIds.has(mark.id)
+    (mark) => !usedSet.has(mark.id)
   );
 
   if (availableMarks.length < config.numberOfOptions) {
@@ -18,7 +20,7 @@ export function generateGuessQuestion(
 
   // Select a random target mark
   const targetMark = availableMarks[Math.floor(Math.random() * availableMarks.length)];
-  usedMarkIds.add(targetMark.id);
+  usedSet.add(targetMark.id);
 
   // Find nearby marks for context (within 2km)
   const contextMarks = findNearbyMarks(targetMark, marks, 2000);
@@ -96,8 +98,8 @@ export function generateGuessQuestion(
   const options = [targetMark, ...wrongOptions];
   shuffleArray(options);
 
-  // Add all option IDs to usedMarkIds to prevent repeats
-  options.forEach((mark) => usedMarkIds.add(mark.id));
+  // Add all option IDs to usedSet to prevent repeats
+  options.forEach((mark) => usedSet.add(mark.id));
 
   return { targetMark, options, contextMarks };
 }
