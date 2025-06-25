@@ -4,16 +4,23 @@ import { calculateDistance, findNearbyMarks, getMarksByDifficulty } from "./gpxP
 // Generate a guess-the-mark question
 export function generateGuessQuestion(
   marks: RacingMark[],
-  config: GameConfig
+  config: GameConfig,
+  usedMarkIds?: Set<string>
 ): { targetMark: RacingMark; options: RacingMark[]; contextMarks: RacingMark[] } {
-  const availableMarks = getMarksByDifficulty(marks, config.difficulty);
+  // Default to a new Set if not provided
+  const usedSet = usedMarkIds ?? new Set<string>();
+  // Only use marks that haven't been used yet
+  const availableMarks = getMarksByDifficulty(marks, config.difficulty).filter(
+    (mark) => !usedSet.has(mark.id)
+  );
 
   if (availableMarks.length < config.numberOfOptions) {
     throw new Error("Not enough marks available for this difficulty level");
   }
 
-  // Select a random target mark
-  const targetMark = availableMarks[Math.floor(Math.random() * availableMarks.length)];
+  // Select a random target mark using crypto-based randomness
+  const targetMark = availableMarks[getCryptoRandomInt(availableMarks.length)];
+  usedSet.add(targetMark.id);
 
   // Find nearby marks for context (within 2km)
   const contextMarks = findNearbyMarks(targetMark, marks, 2000);
@@ -60,7 +67,9 @@ export function generateGuessQuestion(
     const goodDistanceOptions: RacingMark[] = [];
     const fallbackOptions: RacingMark[] = [];
     // Exclude other same-type marks from remaining options
-    const allOtherMarks = marks.filter((mark) => !usedIds.has(mark.id));
+    const allOtherMarks = marks.filter(
+      (mark) => !usedIds.has(mark.id) && mark.symbol !== targetMark.symbol
+    );
 
     // Separate marks into preferred and fallback lists
     for (const mark of allOtherMarks) {
@@ -90,6 +99,9 @@ export function generateGuessQuestion(
   // Combine target and wrong options, then shuffle
   const options = [targetMark, ...wrongOptions];
   shuffleArray(options);
+
+  // Add all option IDs to usedSet to prevent repeats
+  options.forEach((mark) => usedSet.add(mark.id));
 
   return { targetMark, options, contextMarks };
 }
@@ -164,12 +176,24 @@ function getGeneralArea(mark: RacingMark): string {
   return "central";
 }
 
-// Utility function to shuffle an array
+/**
+ * Utility function to shuffle an array using crypto-based randomness
+ */
 export function shuffleArray<T>(array: T[]): void {
   for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = getCryptoRandomInt(i + 1);
     [array[i], array[j]] = [array[j], array[i]];
   }
+}
+
+/**
+ * Returns a random integer from 0 (inclusive) to max (exclusive) using crypto.getRandomValues.
+ */
+function getCryptoRandomInt(max: number): number {
+  if (max <= 0) throw new Error("max must be positive");
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return array[0] % max;
 }
 
 // Calculate streak bonus

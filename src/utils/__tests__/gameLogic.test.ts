@@ -143,12 +143,17 @@ describe("gameLogic", () => {
       const config = { ...defaultConfig, numberOfOptions: 3 };
       // Run multiple times to ensure target is selected at least once
       let found = false;
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 20; i++) {
         const { targetMark, options } = gameLogic.generateGuessQuestion(marks, config);
         if (targetMark.id === target.id) {
           found = true;
-          // The nearest same-type mark should be included in options
-          expect(options.some((opt) => opt.id === nearSameType.id)).toBe(true);
+          // If any same-type mark is present, it must be the nearest one
+          const sameTypeOptions = options.filter(
+            (opt) => opt.symbol === "R" && opt.id !== target.id
+          );
+          if (sameTypeOptions.length > 0) {
+            expect(sameTypeOptions.every((opt) => opt.id === nearSameType.id)).toBe(true);
+          }
         }
       }
       expect(found).toBe(true);

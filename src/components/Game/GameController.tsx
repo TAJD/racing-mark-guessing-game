@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { GameState, GameConfig, RacingMark } from "../../types/game";
 import { OpenSeaMapContainer } from "../Map/OpenSeaMapContainer";
 import { MarkLegend } from "../Graphics/MarkIcons";
@@ -44,6 +44,9 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     gameStartTime: Date.now(),
   });
 
+  // Track used mark IDs across questions
+  const usedMarkIdsRef = useRef<Set<string>>(new Set());
+
   const [currentQuestion, setCurrentQuestion] = useState<{
     targetMark: RacingMark;
     options?: RacingMark[];
@@ -66,7 +69,12 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         setGameEnded(true);
         return;
       }
-      const { targetMark, options, contextMarks } = generateGuessQuestion(marks, config);
+      // Pass usedMarkIdsRef.current to generateGuessQuestion
+      const { targetMark, options, contextMarks } = generateGuessQuestion(
+        marks,
+        config,
+        usedMarkIdsRef.current
+      );
       setCurrentQuestion({ targetMark, options, contextMarks });
 
       // Center map on target area with context marks visible
@@ -95,10 +103,10 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
           console.error("No racing marks loaded:", data);
           setGameEnded(true);
         } else {
-          // Shuffle marks for true randomness each game
           const shuffled = [...data];
           shuffleArray(shuffled);
           setMarks(shuffled);
+          usedMarkIdsRef.current = new Set();
         }
       })
       .catch((err) => {
@@ -171,9 +179,12 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
       const result = evaluateGuess(currentQuestion.targetMark, selectedMark, timeElapsed, config);
 
       setGameState((prev) => {
-        // Add streak bonus
         const streakBonus = result.isCorrect ? calculateStreakBonus(prev.streak + 1) : 0;
         const totalPoints = result.points + streakBonus;
+
+        if (currentQuestion) {
+          usedMarkIdsRef.current.add(currentQuestion.targetMark.id);
+        }
 
         const newState = {
           ...prev,
@@ -187,10 +198,8 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         setLastResult({ ...result, streakBonus, totalPoints });
         setShowResult(true);
 
-        // Auto-advance after showing result
         setTimeout(() => {
           if (newState.totalQuestions >= 10) {
-            // End after 10 questions
             setGameEnded(true);
           } else {
             generateNewQuestion();
