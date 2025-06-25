@@ -18,8 +18,8 @@ export function generateGuessQuestion(
     throw new Error("Not enough marks available for this difficulty level");
   }
 
-  // Select a random target mark
-  const targetMark = availableMarks[Math.floor(Math.random() * availableMarks.length)];
+  // Select a random target mark using crypto-based randomness
+  const targetMark = availableMarks[getCryptoRandomInt(availableMarks.length)];
   usedSet.add(targetMark.id);
 
   // Find nearby marks for context (within 2km)
@@ -174,12 +174,24 @@ function getGeneralArea(mark: RacingMark): string {
   return "central";
 }
 
-// Utility function to shuffle an array
+/**
+ * Utility function to shuffle an array using crypto-based randomness
+ */
 export function shuffleArray<T>(array: T[]): void {
   for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = getCryptoRandomInt(i + 1);
     [array[i], array[j]] = [array[j], array[i]];
   }
+}
+
+/**
+ * Returns a random integer from 0 (inclusive) to max (exclusive) using crypto.getRandomValues.
+ */
+function getCryptoRandomInt(max: number): number {
+  if (max <= 0) throw new Error("max must be positive");
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return array[0] % max;
 }
 
 // Calculate streak bonus
