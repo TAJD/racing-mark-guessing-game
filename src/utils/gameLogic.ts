@@ -67,7 +67,9 @@ export function generateGuessQuestion(
     const goodDistanceOptions: RacingMark[] = [];
     const fallbackOptions: RacingMark[] = [];
     // Exclude other same-type marks from remaining options
-    const allOtherMarks = marks.filter((mark) => !usedIds.has(mark.id));
+    const allOtherMarks = marks.filter(
+      (mark) => !usedIds.has(mark.id) && mark.symbol !== targetMark.symbol
+    );
 
     // Separate marks into preferred and fallback lists
     for (const mark of allOtherMarks) {
