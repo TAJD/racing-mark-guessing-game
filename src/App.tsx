@@ -40,9 +40,12 @@ function App() {
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 md:p-8 text-center">
-              <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Guess the Mark!</h1>
+              <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">
+                Solent Racing Mark Quiz
+              </h1>
               <p className="text-blue-100 text-base md:text-lg">
-                Test your knowledge of racing marks in the Solent!
+                Master sailing navigation and yacht racing marks in the Solent with our interactive
+                training game
               </p>
             </div>
 
@@ -53,12 +56,13 @@ function App() {
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">🎯</span>
                     <div>
-                      <h3 className="text-lg md:text-xl font-semibold text-blue-700 mb-2">
-                        How to Play
-                      </h3>
+                      <h2 className="text-lg md:text-xl font-semibold text-blue-700 mb-2">
+                        Sailing Navigation Training - How to Play
+                      </h2>
                       <p className="text-gray-600 mb-3 text-sm md:text-base leading-relaxed">
-                        Look at the chart and identify which racing mark is highlighted. Use nearby
-                        context marks and chart features to help you.
+                        Practice identifying Solent racing marks on our interactive nautical chart.
+                        Perfect for RYA course preparation and yacht racing training. Use nearby
+                        context marks and chart features to master maritime navigation.
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs md:text-sm text-gray-600">
                         <div className="flex items-center gap-1">
@@ -83,7 +87,7 @@ function App() {
               <div className="bg-gray-50 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <span>⚙️</span>
-                  Game Settings
+                  Racing Mark Quiz Settings
                 </h3>
 
                 <div className="space-y-4">
@@ -104,9 +108,11 @@ function App() {
                         }}
                         className="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm md:text-base"
                       >
-                        <option value="beginner">🌟 Beginner - Famous landmarks</option>
-                        <option value="intermediate">⭐ Intermediate - Mixed marks</option>
-                        <option value="advanced">🏆 Advanced - All marks</option>
+                        <option value="beginner">🌟 Beginner - Famous Solent racing marks</option>
+                        <option value="intermediate">
+                          ⭐ Intermediate - Mixed SCRA racing marks
+                        </option>
+                        <option value="advanced">🏆 Advanced - All Solent navigation marks</option>
                       </select>
                     </div>
 
@@ -202,7 +208,8 @@ function App() {
                   </a>
                   .
                   <br className="hidden sm:inline" />
-                  Perfect for sailors learning the area or testing their local knowledge!
+                  Perfect for RYA course preparation, sailing instructors, and yacht racing crews
+                  mastering Solent navigation!
                 </p>
               </div>
             </div>
