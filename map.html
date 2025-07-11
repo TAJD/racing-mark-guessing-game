@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saronic Gulf Sailing Trip</title>
+    <title>Saronic Gulf Sailing Trip - OpenSeaMap</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <style>
@@ -14,168 +14,207 @@
             background-color: #f0f9ff;
         }
         .header {
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            background: linear-gradient(135deg, #0f766e, #0891b2);
             color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .header h1 {
             margin: 0;
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
         .header p {
-            margin: 0.25rem 0 0 0;
+            margin: 0.5rem 0 0 0;
             opacity: 0.9;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
         .map-controls {
             background: white;
             padding: 1rem 2rem;
             border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .map-controls button {
-            background: #3b82f6;
+            background: #0891b2;
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            margin-right: 0.5rem;
-            border-radius: 4px;
+            padding: 0.6rem 1.2rem;
+            margin-right: 0.75rem;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
         }
         .map-controls button:hover {
-            background: #2563eb;
+            background: #0e7490;
+            transform: translateY(-1px);
         }
         .map-controls button.active {
-            background: #1d4ed8;
+            background: #0f766e;
+            box-shadow: 0 2px 8px rgba(15, 118, 110, 0.3);
         }
         .container {
             display: flex;
-            height: calc(100vh - 160px);
-            max-width: 1400px;
+            height: calc(100vh - 180px);
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
         }
         #map {
             flex: 1;
             min-height: 600px;
         }
         .sidebar {
-            width: 350px;
+            width: 380px;
             background: #f8fafc;
-            padding: 1.5rem;
+            padding: 2rem;
             overflow-y: auto;
             border-left: 1px solid #e2e8f0;
         }
         .trip-summary {
             background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            border-left: 4px solid #0891b2;
         }
         .trip-summary h3 {
-            margin: 0 0 0.75rem 0;
-            color: #1e40af;
-            font-size: 1.1rem;
+            margin: 0 0 1rem 0;
+            color: #0f766e;
+            font-size: 1.25rem;
+            font-weight: 700;
         }
         .summary-item {
             display: flex;
             justify-content: space-between;
-            margin: 0.5rem 0;
-            font-size: 0.9rem;
+            margin: 0.75rem 0;
+            font-size: 0.95rem;
         }
         .summary-label {
             color: #64748b;
+            font-weight: 500;
         }
         .summary-value {
-            font-weight: 600;
+            font-weight: 700;
             color: #1e293b;
         }
         .legend {
             background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
         }
         .legend h3 {
-            margin: 0 0 0.75rem 0;
-            color: #1e40af;
-            font-size: 1.1rem;
+            margin: 0 0 1rem 0;
+            color: #0f766e;
+            font-size: 1.25rem;
+            font-weight: 700;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 0.5rem 0;
-            font-size: 0.85rem;
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .legend-item:hover {
+            background-color: #f1f5f9;
         }
         .legend-icon {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
             border: 2px solid white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         .leg-details {
             background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-left: 4px solid #3b82f6;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid #0891b2;
         }
         .leg-details h4 {
-            margin: 0 0 0.75rem 0;
-            color: #1e40af;
-            font-size: 1rem;
+            margin: 0 0 1rem 0;
+            color: #0f766e;
+            font-size: 1.1rem;
+            font-weight: 700;
         }
         .detail-item {
-            margin: 0.5rem 0;
-            font-size: 0.85rem;
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
         }
         .detail-label {
             font-weight: 600;
             color: #374151;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .detail-value {
-            color: #6b7280;
+            color: #1f2937;
+            font-weight: 500;
         }
         .notes {
-            background: #f1f5f9;
-            padding: 0.75rem;
-            border-radius: 6px;
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
-            color: #475569;
-            line-height: 1.4;
-        }
-        .map-error {
-            background: #fef2f2;
-            border: 2px dashed #fca5a5;
-            color: #dc2626;
-            padding: 2rem;
-            text-align: center;
-            margin: 1rem;
+            background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
+            padding: 1rem;
             border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #065f46;
+            line-height: 1.5;
+            border-left: 3px solid #10b981;
+        }
+        .marine-info {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #1e40af;
+            border-left: 3px solid #3b82f6;
         }
 
 ```
     /* Responsive design */
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
         .container {
             flex-direction: column;
             height: auto;
         }
         .sidebar {
             width: 100%;
-            max-height: 300px;
+            max-height: 400px;
         }
         #map {
-            height: 500px;
+            height: 600px;
         }
+    }
+
+    /* Custom Leaflet styles */
+    .nautical-popup .leaflet-popup-content-wrapper {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        color: #0c4a6e;
+        border-radius: 8px;
+    }
+    .nautical-popup .leaflet-popup-tip {
+        background: #f0f9ff;
     }
 </style>
 ```
@@ -183,83 +222,92 @@
 </head>
 <body>
     <div class="header">
-        <h1>⚓ Saronic Gulf Sailing Trip</h1>
-        <p>📍 Total Distance: 146.7 NM | ⛵ Boat Speed: Engine 5kts, Sail 7kts | 📅 6 Days</p>
+        <h1>
+            <span style="font-size: 2.5rem;">⚓</span>
+            Saronic Gulf Sailing Trip - Marine Charts
+        </h1>
+        <p>🗺️ OpenSeaMap Marine Navigation | 📍 Total Distance: 146.7 NM | ⛵ 6 Days Adventure</p>
     </div>
 
 ```
 <div class="map-controls">
-    <button id="osm-btn" class="active">OpenStreetMap</button>
-    <button id="carto-btn">CartoDB</button>
-    <button id="topo-btn">Topographic</button>
-    <button id="satellite-btn">Satellite</button>
-    <span style="margin-left: 1rem; color: #6b7280;">Try different map providers if one doesn't load</span>
+    <button id="seamap-btn" class="active">🗺️ Marine Chart</button>
+    <button id="satellite-btn">🛰️ Satellite</button>
+    <button id="hybrid-btn">🔗 Hybrid</button>
+    <button id="osm-btn">🗾 Street Map</button>
+    <span style="margin-left: 1.5rem; color: #64748b; font-weight: 500;">
+        Marine charts show depths, harbours, and navigation aids
+    </span>
 </div>
 
 <div class="container">
-    <div id="map">
-        <div class="map-error" id="map-error" style="display: none;">
-            <h3>Map Loading Issue</h3>
-            <p>Some map providers may be blocked in this environment. Try switching providers above, or:</p>
-            <ul style="text-align: left; margin-top: 1rem;">
-                <li>Copy this HTML file and open it in your browser</li>
-                <li>Use Google My Maps or similar online tools</li>
-                <li>The interactive SVG version still shows all route details</li>
-            </ul>
-        </div>
-    </div>
+    <div id="map"></div>
     
     <div class="sidebar">
         <div class="trip-summary">
-            <h3>Trip Summary</h3>
+            <h3>⛵ Sailing Adventure</h3>
             <div class="summary-item">
-                <span class="summary-label">Duration:</span>
+                <span class="summary-label">🗓️ Duration:</span>
                 <span class="summary-value">6 Days</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Total Distance:</span>
+                <span class="summary-label">📏 Total Distance:</span>
                 <span class="summary-value">146.7 NM</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Destinations:</span>
+                <span class="summary-label">🏝️ Destinations:</span>
                 <span class="summary-value">7 Stops</span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Average Speed:</span>
+                <span class="summary-label">⚡ Average Speed:</span>
                 <span class="summary-value">~6 knots</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">🌊 Waters:</span>
+                <span class="summary-value">Saronic Gulf</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">🚢 Boat Speeds:</span>
+                <span class="summary-value">Engine 5kts | Sail 7kts</span>
             </div>
         </div>
 
         <div class="legend">
-            <h3>Legend</h3>
+            <h3>🧭 Navigation Legend</h3>
             <div class="legend-item">
                 <div class="legend-icon" style="background-color: #059669;"></div>
-                <span>🏁 Start/End Point</span>
+                <span><strong>🏁 Start/End Port</strong> - Alimos Marina</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon" style="background-color: #dc2626;"></div>
-                <span>⚓ Overnight Stop</span>
+                <span><strong>⚓ Overnight Anchorage</strong> - Safe harbours</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon" style="background-color: #0891b2;"></div>
-                <span>💧 Water Stop</span>
+                <span><strong>💧 Water Stop</strong> - Fuel & provisions</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon" style="background-color: #d97706;"></div>
-                <span>🍽️ Lunch Stop</span>
+                <span><strong>🍽️ Lunch Anchorage</strong> - Day stop</span>
             </div>
             <div class="legend-item">
-                <div style="width: 20px; height: 3px; background-color: #3b82f6; margin-right: 0.25rem; border-radius: 2px;"></div>
-                <span>📍 Route Segments</span>
+                <div style="width: 24px; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); margin-right: 0.5rem; border-radius: 2px;"></div>
+                <span><strong>📍 Sailing Route</strong> - Daily legs</span>
             </div>
         </div>
 
         <div class="leg-details" id="leg-info">
-            <h4>Click on route segments or markers for details</h4>
-            <p style="color: #6b7280; font-size: 0.85rem;">
-                The map shows your complete sailing route through the Saronic Gulf. 
-                Click on any blue route line or destination marker to see detailed 
-                information about that leg of the journey.
+            <h4>🗺️ Interactive Marine Chart</h4>
+            <div class="marine-info">
+                <strong>How to use this chart:</strong><br>
+                • Click numbered route segments for leg details<br>
+                • Click destination markers for harbour info<br>
+                • Switch between marine chart and satellite views<br>
+                • Marine chart shows depths and navigation aids
+            </div>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 1rem; line-height: 1.4;">
+                This interactive chart displays your complete sailing route through the Saronic Gulf 
+                with marine navigation features including depth contours, harbours, and anchorages.
             </p>
         </div>
     </div>
@@ -267,22 +315,79 @@
 
 <script>
     let map;
-    let currentLayer;
+    let currentBaseLayer;
+    let seamapOverlay;
     let routeLayersGroup;
 
-    // Define destinations with coordinates
+    // Define destinations with precise coordinates and marine details
     const destinations = [
-        { id: 'alimos', name: 'Alimos (Athens)', coords: [37.914, 23.726], type: 'start', icon: '🏁' },
-        { id: 'sounion', name: 'Sounion', coords: [37.651, 24.026], type: 'stop', icon: '⚓' },
-        { id: 'aigina-town', name: 'Aigina Town', coords: [37.746, 23.431], type: 'stop', icon: '⚓' },
-        { id: 'poros', name: 'Poros', coords: [37.510, 23.457], type: 'water', icon: '💧' },
-        { id: 'dokos', name: 'Dokos', coords: [37.354, 23.228], type: 'stop', icon: '⚓' },
-        { id: 'epidavros', name: 'Epidavros', coords: [37.630, 23.137], type: 'stop', icon: '⚓' },
-        { id: 'nisis-mini', name: 'Nisis Mini', coords: [37.52, 23.40], type: 'lunch', icon: '🍽️' },
-        { id: 'aigina-other', name: 'Aigina (Other Side)', coords: [37.72, 23.42], type: 'stop', icon: '⚓' }
+        { 
+            id: 'alimos', 
+            name: 'Alimos Marina', 
+            coords: [37.914, 23.726], 
+            type: 'start', 
+            icon: '🏁',
+            details: 'Modern marina with full facilities. Depth: 3-4m. Protected harbour.'
+        },
+        { 
+            id: 'sounion', 
+            name: 'Cape Sounion', 
+            coords: [37.651, 24.026], 
+            type: 'stop', 
+            icon: '⚓',
+            details: 'Scenic anchorage near Temple of Poseidon. Depth: 8-15m. Some wind protection.'
+        },
+        { 
+            id: 'aigina-town', 
+            name: 'Aigina Port', 
+            coords: [37.746, 23.431], 
+            type: 'stop', 
+            icon: '⚓',
+            details: 'Historic port town. Depth: 2-6m in harbour. Good restaurants and provisioning.'
+        },
+        { 
+            id: 'poros', 
+            name: 'Poros Town', 
+            coords: [37.510, 23.457], 
+            type: 'water', 
+            icon: '💧',
+            details: 'Water and fuel available. Narrow channel. Depth: 3-8m. Scenic setting.'
+        },
+        { 
+            id: 'dokos', 
+            name: 'Dokos Island', 
+            coords: [37.354, 23.228], 
+            type: 'stop', 
+            icon: '⚓',
+            details: 'Skindos Bay anchorage. Depth: 4-12m. Crystal clear waters. Remote and peaceful.'
+        },
+        { 
+            id: 'epidavros', 
+            name: 'Epidavros', 
+            coords: [37.630, 23.137], 
+            type: 'stop', 
+            icon: '⚓',
+            details: 'Small fishing harbour. Depth: 2-5m. Visit ancient theatre. Local tavernas.'
+        },
+        { 
+            id: 'nisis-mini', 
+            name: 'Nisis Mini', 
+            coords: [37.52, 23.40], 
+            type: 'lunch', 
+            icon: '🍽️',
+            details: 'Day anchorage for lunch. Depth: 5-10m. Beautiful small island setting.'
+        },
+        { 
+            id: 'aigina-other', 
+            name: 'Perdika Bay', 
+            coords: [37.72, 23.42], 
+            type: 'stop', 
+            icon: '⚓',
+            details: 'Quiet fishing village. Marathonas Bay alternative. Depth: 3-8m.'
+        }
     ];
 
-    // Define legs with detailed information
+    // Define legs with enhanced marine details
     const legs = [
         {
             id: 1,
@@ -293,7 +398,9 @@
             arrival: '~1:15 PM',
             distance: '19.6 NM',
             time: '~3h 15m',
-            notes: 'Overnight: Sounion (Anchorage near Temple of Poseidon)',
+            bearing: 'ESE',
+            notes: 'Departure from Alimos Marina. Head ESE along Attica coast. Watch for ferry traffic near Piraeus. Temple of Poseidon visible on approach.',
+            overnight: 'Anchor in 8-15m, sand bottom, N of temple. Some wind protection from headland.',
             color: '#3b82f6'
         },
         {
@@ -305,7 +412,9 @@
             arrival: '~1:25 PM',
             distance: '20.5 NM',
             time: '~3h 25m',
-            notes: 'Overnight: Aigina Town Port',
+            bearing: 'WNW',
+            notes: 'Cross Saronic Gulf to Aigina. Generally calm waters. Approach from SE to avoid shallows N of port.',
+            overnight: 'Aigina Town harbour or anchor in bay. Depth 2-6m. Good holding, some ferry wash.',
             color: '#8b5cf6'
         },
         {
@@ -317,8 +426,10 @@
             departure: '10:00 AM',
             arrival: '~4:30-5:00 PM',
             distance: '33.8 NM',
-            time: '~5h 40m',
-            notes: 'Stop at Poros for water refill. Overnight: Dokos Island (Skindos Bay)',
+            time: '~5h 40m + water stop',
+            bearing: 'S then SW',
+            notes: 'Head S to Poros for water/fuel. Navigate narrow channel carefully. Then SW to Dokos - remote and beautiful.',
+            overnight: 'Skindos Bay, Dokos. Anchor in 4-12m, excellent holding. Crystal clear water, very protected.',
             color: '#10b981'
         },
         {
@@ -330,7 +441,9 @@
             arrival: '~4:20 PM',
             distance: '37.9 NM',
             time: '~6h 20m',
-            notes: 'Overnight: Epidavros (Rocks taverna "Mouira")',
+            bearing: 'NNE',
+            notes: 'Longest leg. Head N up Argolic Gulf. Coast is dramatic with mountains. Approach Epidavros from E.',
+            overnight: 'Small fishing harbour. Depth 2-5m. Visit ancient theatre. Mouira taverna recommended.',
             color: '#f59e0b'
         },
         {
@@ -342,9 +455,11 @@
             departure: '10:00 AM',
             arrival: '~2:30-3:30 PM',
             distance: '14.6 NM',
-            time: '~4.5-5.5h',
+            time: '~4.5-5.5h with lunch',
+            bearing: 'ENE',
             wind: 'N 5-10 knots',
-            notes: 'Long lunch at Nisis Mini (2-3h). Overnight: Perdika/Marathonas Bay',
+            notes: 'Shorter day with lunch stop at Nisis Mini. Approach Perdika/Marathonas from S. Explore Aigina\'s quieter side.',
+            overnight: 'Perdika village or Marathonas Bay. Peaceful anchorage, good tavernas, depth 3-8m.',
             color: '#ef4444'
         },
         {
@@ -356,25 +471,24 @@
             arrival: '~4:00 PM',
             distance: '20.3 NM',
             time: '~3h 25m',
+            bearing: 'NE',
             wind: 'NNW 10 knots',
-            notes: 'Return to Alimos (Athens)',
+            notes: 'Final leg back to Athens. Head NE across Saronic Gulf. Watch for increased traffic near Piraeus approaches.',
+            overnight: 'Return to Alimos Marina. End of voyage.',
             color: '#6366f1'
         }
     ];
 
-    // Map tile layers
-    const tileLayers = {
-        osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Map layers
+    const baseLayers = {
+        seamap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }),
-        carto: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap contributors © CARTO'
-        }),
-        topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors © OpenTopoMap'
-        }),
         satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '© Esri © HERE © Garmin © SafeGraph'
+            attribution: '© Esri'
+        }),
+        osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
         })
     };
 
@@ -382,8 +496,16 @@
     function initMap() {
         try {
             map = L.map('map').setView([37.65, 23.45], 10);
-            currentLayer = tileLayers.osm;
-            currentLayer.addTo(map);
+            
+            // Start with base map
+            currentBaseLayer = baseLayers.seamap;
+            currentBaseLayer.addTo(map);
+            
+            // Add OpenSeaMap overlay for marine features
+            seamapOverlay = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+                attribution: '© OpenSeaMap contributors'
+            });
+            seamapOverlay.addTo(map);
             
             // Create layer group for routes
             routeLayersGroup = L.layerGroup().addTo(map);
@@ -391,35 +513,22 @@
             // Add markers and routes
             addMarkersAndRoutes();
             
-            // Fit map to show all markers
+            // Fit map to show all markers with padding
             const group = new L.featureGroup(destinations.map(dest => 
                 L.marker(dest.coords)
             ));
-            map.fitBounds(group.getBounds().pad(0.1));
-            
-            // Hide error message
-            document.getElementById('map-error').style.display = 'none';
-            
-            // Test if tiles are loading
-            setTimeout(() => {
-                const tiles = document.querySelectorAll('.leaflet-tile');
-                if (tiles.length === 0) {
-                    document.getElementById('map-error').style.display = 'block';
-                }
-            }, 3000);
+            map.fitBounds(group.getBounds().pad(0.15));
             
         } catch (error) {
             console.error('Map initialization failed:', error);
-            document.getElementById('map-error').style.display = 'block';
         }
     }
 
-    // Helper function to get destination by ID
+    // Helper functions
     function getDestination(id) {
         return destinations.find(d => d.id === id);
     }
 
-    // Helper function to get marker color by type
     function getMarkerColor(type) {
         switch (type) {
             case 'start': return '#059669';
@@ -429,43 +538,42 @@
         }
     }
 
-    // Add markers and routes to map
+    // Add markers and routes
     function addMarkersAndRoutes() {
-        // Clear existing routes
         routeLayersGroup.clearLayers();
 
-        // Add markers for destinations
+        // Add destination markers
         destinations.forEach(dest => {
             const marker = L.circleMarker(dest.coords, {
-                radius: dest.type === 'start' ? 10 : 8,
+                radius: dest.type === 'start' ? 12 : 10,
                 fillColor: getMarkerColor(dest.type),
                 color: 'white',
-                weight: 2,
+                weight: 3,
                 opacity: 1,
                 fillOpacity: 1
             });
 
             const popupContent = `
-                <div style="text-align: center; min-width: 150px;">
-                    <h4 style="margin: 0 0 5px 0; color: #1e40af;">
+                <div style="min-width: 200px;" class="nautical-popup">
+                    <h4 style="margin: 0 0 8px 0; color: #0c4a6e; font-size: 1.1rem;">
                         ${dest.icon} ${dest.name}
                     </h4>
-                    <p style="margin: 0; color: #64748b; font-size: 0.9rem;">
-                        ${dest.type === 'start' ? 'Start/End Point' : 
-                          dest.type === 'water' ? 'Water Stop' :
-                          dest.type === 'lunch' ? 'Lunch Stop' : 'Overnight Stop'}
+                    <p style="margin: 0 0 8px 0; color: #0369a1; font-weight: 600; font-size: 0.9rem;">
+                        ${dest.type === 'start' ? 'Marina & Start Point' : 
+                          dest.type === 'water' ? 'Fuel & Water Stop' :
+                          dest.type === 'lunch' ? 'Lunch Anchorage' : 'Overnight Anchorage'}
+                    </p>
+                    <p style="margin: 0; color: #075985; font-size: 0.85rem; line-height: 1.4;">
+                        ${dest.details}
                     </p>
                 </div>
             `;
             
             marker.bindPopup(popupContent);
-            
             marker.on('click', function() {
-                // Find legs that involve this destination
                 const relatedLegs = legs.filter(leg => 
                     leg.from === dest.id || leg.to === dest.id || leg.via === dest.id
                 );
-                
                 if (relatedLegs.length > 0) {
                     showLegDetails(relatedLegs[0]);
                 }
@@ -481,7 +589,6 @@
             
             let routeCoords = [fromDest.coords, toDest.coords];
             
-            // If there's a via point, create a multi-segment route
             if (leg.via) {
                 const viaDest = getDestination(leg.via);
                 routeCoords = [fromDest.coords, viaDest.coords, toDest.coords];
@@ -489,7 +596,7 @@
             
             const polyline = L.polyline(routeCoords, {
                 color: leg.color,
-                weight: 4,
+                weight: 5,
                 opacity: 0.8
             });
             
@@ -499,52 +606,57 @@
             
             routeLayersGroup.addLayer(polyline);
             
-            // Add leg number label at midpoint
+            // Add leg number
             const midpoint = routeCoords[Math.floor(routeCoords.length / 2)];
             const legLabel = L.circleMarker(midpoint, {
-                radius: 12,
+                radius: 15,
                 fillColor: leg.color,
                 color: 'white',
-                weight: 2,
+                weight: 3,
                 opacity: 1,
                 fillOpacity: 1
             });
             
-            legLabel.bindTooltip(`Leg ${leg.id}`, {
-                permanent: false,
-                direction: 'center'
-            });
-            
-            // Add number text
             const numberIcon = L.divIcon({
-                html: `<div style="color: white; text-align: center; font-weight: bold; font-size: 11px; line-height: 24px;">${leg.id}</div>`,
+                html: `<div style="color: white; text-align: center; font-weight: bold; font-size: 12px; line-height: 30px;">${leg.id}</div>`,
                 className: 'leg-number-icon',
-                iconSize: [24, 24]
+                iconSize: [30, 30]
             });
             
             const numberMarker = L.marker(midpoint, { icon: numberIcon });
             
-            legLabel.on('click', function() {
-                showLegDetails(leg);
-            });
-            
-            numberMarker.on('click', function() {
-                showLegDetails(leg);
-            });
+            legLabel.on('click', () => showLegDetails(leg));
+            numberMarker.on('click', () => showLegDetails(leg));
             
             routeLayersGroup.addLayer(legLabel);
             routeLayersGroup.addLayer(numberMarker);
         });
     }
 
-    // Switch map layers
+    // Switch layers
     function switchLayer(layerKey) {
-        if (map && currentLayer) {
-            map.removeLayer(currentLayer);
+        if (map && currentBaseLayer) {
+            map.removeLayer(currentBaseLayer);
         }
-        currentLayer = tileLayers[layerKey];
-        if (map) {
-            currentLayer.addTo(map);
+        
+        if (layerKey === 'hybrid') {
+            currentBaseLayer = baseLayers.satellite;
+            currentBaseLayer.addTo(map);
+            if (!map.hasLayer(seamapOverlay)) {
+                seamapOverlay.addTo(map);
+            }
+        } else if (layerKey === 'seamap') {
+            currentBaseLayer = baseLayers.osm;
+            currentBaseLayer.addTo(map);
+            if (!map.hasLayer(seamapOverlay)) {
+                seamapOverlay.addTo(map);
+            }
+        } else {
+            currentBaseLayer = baseLayers[layerKey];
+            currentBaseLayer.addTo(map);
+            if (map.hasLayer(seamapOverlay)) {
+                map.removeLayer(seamapOverlay);
+            }
         }
         
         // Update button states
@@ -554,7 +666,7 @@
         document.getElementById(layerKey + '-btn').classList.add('active');
     }
 
-    // Function to display leg details in sidebar
+    // Show leg details
     function showLegDetails(leg) {
         const fromDest = getDestination(leg.from);
         const toDest = getDestination(leg.to);
@@ -563,52 +675,62 @@
         const legInfo = document.getElementById('leg-info');
         
         legInfo.innerHTML = `
-            <h4>Leg ${leg.id} - ${leg.day}</h4>
+            <h4>🧭 Leg ${leg.id} - ${leg.day}</h4>
             <div class="detail-item">
-                <span class="detail-label">Route:</span>
+                <span class="detail-label">🗺️ Route</span>
                 <span class="detail-value">
                     ${fromDest.name} → ${viaDest ? viaDest.name + ' → ' : ''}${toDest.name}
                 </span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Departure:</span>
+                <span class="detail-label">⏰ Departure</span>
                 <span class="detail-value">${leg.departure}</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Arrival:</span>
+                <span class="detail-label">🎯 Arrival</span>
                 <span class="detail-value">${leg.arrival}</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Distance:</span>
+                <span class="detail-label">📏 Distance</span>
                 <span class="detail-value">${leg.distance}</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">Est. Time:</span>
+                <span class="detail-label">⏱️ Sailing Time</span>
                 <span class="detail-value">${leg.time}</span>
             </div>
+            ${leg.bearing ? `
+            <div class="detail-item">
+                <span class="detail-label">🧭 Bearing</span>
+                <span class="detail-value">${leg.bearing}</span>
+            </div>
+            ` : ''}
             ${leg.wind ? `
             <div class="detail-item">
-                <span class="detail-label">Wind:</span>
+                <span class="detail-label">🌪️ Wind Forecast</span>
                 <span class="detail-value">${leg.wind}</span>
             </div>
             ` : ''}
             <div class="notes">
-                <strong>Notes:</strong><br>
+                <strong>🗒️ Navigation Notes:</strong><br>
                 ${leg.notes}
+            </div>
+            <div class="marine-info">
+                <strong>⚓ Overnight Details:</strong><br>
+                ${leg.overnight}
             </div>
         `;
     }
 
-    // Event listeners for map layer buttons
-    document.getElementById('osm-btn').addEventListener('click', () => switchLayer('osm'));
-    document.getElementById('carto-btn').addEventListener('click', () => switchLayer('carto'));
-    document.getElementById('topo-btn').addEventListener('click', () => switchLayer('topo'));
+    // Event listeners
+    document.getElementById('seamap-btn').addEventListener('click', () => switchLayer('seamap'));
     document.getElementById('satellite-btn').addEventListener('click', () => switchLayer('satellite'));
+    document.getElementById('hybrid-btn').addEventListener('click', () => switchLayer('hybrid'));
+    document.getElementById('osm-btn').addEventListener('click', () => switchLayer('osm'));
 
-    // Initialize map when page loads
+    // Initialize when page loads
     document.addEventListener('DOMContentLoaded', initMap);
 
-    // Add custom CSS for tooltips
+    // Custom styles
     const style = document.createElement('style');
     style.textContent = `
         .leg-number-icon {
@@ -618,7 +740,6 @@
     `;
     document.head.appendChild(style);
 </script>
-```
 
 </body>
 </html>
