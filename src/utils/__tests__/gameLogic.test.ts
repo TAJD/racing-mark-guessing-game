@@ -73,6 +73,7 @@ const defaultConfig: GameConfig = {
   timeLimit: 45,
   hintEnabled: true,
   openSeaMapEnabled: false,
+  proximityMode: "full",
 };
 
 describe("gameLogic", () => {

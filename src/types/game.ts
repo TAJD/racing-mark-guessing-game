@@ -29,6 +29,8 @@ export interface GameConfig {
   timeLimit?: number;
   hintEnabled: boolean;
   openSeaMapEnabled: boolean;
+  proximityMode: "cowes" | "full";
+  cowesRadius?: number;
 }
 
 export interface GuessResult {

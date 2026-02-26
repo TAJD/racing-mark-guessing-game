@@ -1,5 +1,11 @@
 import type { RacingMark, GameConfig, GuessResult } from "../types/game";
-import { calculateDistance, findNearbyMarks, getMarksByDifficulty } from "./gpxParser";
+import {
+  calculateDistance,
+  findNearbyMarks,
+  getMarksByDifficulty,
+  getMarksByProximity,
+  DEFAULT_COWES_RADIUS,
+} from "./gpxParser";
 
 // Generate a guess-the-mark question
 export function generateGuessQuestion(
@@ -9,10 +15,20 @@ export function generateGuessQuestion(
 ): { targetMark: RacingMark; options: RacingMark[]; contextMarks: RacingMark[] } {
   // Default to a new Set if not provided
   const usedSet = usedMarkIds ?? new Set<string>();
-  // Only use marks that haven't been used yet
-  const availableMarks = getMarksByDifficulty(marks, config.difficulty).filter(
-    (mark) => !usedSet.has(mark.id)
-  );
+
+  // Apply proximity filter if in Cowes mode
+  let availableMarks = marks;
+  if (config.proximityMode === "cowes") {
+    const radius = config.cowesRadius ?? DEFAULT_COWES_RADIUS;
+    availableMarks = getMarksByProximity(marks, radius);
+    // In Cowes mode, use all marks regardless of difficulty
+    availableMarks = availableMarks.filter((mark) => !usedSet.has(mark.id));
+  } else {
+    // Only use marks that haven't been used yet
+    availableMarks = getMarksByDifficulty(availableMarks, config.difficulty).filter(
+      (mark) => !usedSet.has(mark.id)
+    );
+  }
 
   if (availableMarks.length < config.numberOfOptions) {
     throw new Error("Not enough marks available for this difficulty level");

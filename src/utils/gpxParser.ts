@@ -108,3 +108,23 @@ export function findNearbyMarks(
     return distance <= radiusMeters;
   });
 }
+
+// Cowes harbor center coordinates
+export const cowesCenter: { lat: number; lon: number } = {
+  lat: 50.76,
+  lon: -1.3,
+};
+
+// Default radius for Cowes proximity mode (in meters)
+export const DEFAULT_COWES_RADIUS = 5000;
+
+// Get marks within a certain radius of Cowes harbor
+export function getMarksByProximity(
+  marks: RacingMark[],
+  radiusMeters: number = DEFAULT_COWES_RADIUS
+): RacingMark[] {
+  return marks.filter((mark) => {
+    const distance = calculateDistance(cowesCenter.lat, cowesCenter.lon, mark.lat, mark.lon);
+    return distance <= radiusMeters;
+  });
+}
