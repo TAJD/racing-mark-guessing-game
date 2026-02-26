@@ -71,26 +71,23 @@ function App() {
             <div className="bg-[#1B2A4A] px-5 py-6 sm:px-6 sm:py-8 text-center border-b-4 border-[#C9A962]">
               <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#C9A962]/10 flex items-center justify-center">
                 <svg className="w-8 h-8 text-[#C9A962]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.71 4.04c-.18-.18-.43-.29-.71-.29H4c-.28 0-.53.11-.71.29l-.04.04v.5l-1.3 8.4c-.19 1.2.68 2.35 1.89 2.56l11.22 1.93c.17.03.34.05.52.05.89 0 1.71-.51 2.11-1.33l1.45-2.96 2.96-1.45c.82-.4 1.33-1.22 1.33-2.11V4.37c0-.28-.11-.53-.29-.71l-.12-.12-.11-.11zM6.5 16.5l-1.09-7.51L18.3 5.8l-1.09 7.51c-.18 1.15-.98 2.14-2.1 2.44-.37.1-.75.15-1.14.15H6.5z"/>
+                  <path d="M20.71 4.04c-.18-.18-.43-.29-.71-.29H4c-.28 0-.53.11-.71.29l-.04.04v.5l-1.3 8.4c-.19 1.2.68 2.35 1.89 2.56l11.22 1.93c.17.03.34.05.52.05.89 0 1.71-.51 2.11-1.33l1.45-2.96 2.96-1.45c.82-.4 1.33-1.22 1.33-2.11V4.37c0-.28-.11-.53-.29-.71l-.12-.12-.11-.11zM6.5 16.5l-1.09-7.51L18.3 5.8l-1.09 7.51c-.18 1.15-.98 2.14-2.1 2.44-.37.1-.75.15-1.14.15H6.5z" />
                 </svg>
               </div>
               <h1 className="text-xl sm:text-2xl font-serif font-semibold text-white tracking-wide">
                 Solent Racing Marks
               </h1>
-              <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                Navigation Training
-              </p>
+              <p className="text-slate-400 text-xs sm:text-sm mt-1">Navigation Training</p>
             </div>
 
             <div className="p-5 sm:p-6">
               {/* Description */}
               <div className="mb-6 sm:mb-7">
                 <div className="bg-[#F8F7F5] border-l-2 border-[#1B2A4A] pl-4 py-3">
-                  <h2 className="text-sm font-medium text-[#1B2A4A] mb-1.5">
-                    How to Play
-                  </h2>
+                  <h2 className="text-sm font-medium text-[#1B2A4A] mb-1.5">How to Play</h2>
                   <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                    Identify racing marks on an interactive chart. Use context clues and geographical knowledge to test your Solent navigation.
+                    Identify racing marks on an interactive chart. Use context clues and
+                    geographical knowledge to test your Solent navigation.
                   </p>
                 </div>
               </div>

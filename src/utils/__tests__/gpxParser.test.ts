@@ -209,15 +209,36 @@ describe("gpxParser", () => {
 
   describe("getMarksByProximity", () => {
     const cowesAreaMarks: RacingMark[] = [
-      { id: "1", name: "3X", lat: 50.768333, lon: -1.307167, symbol: "Y", description: "Island Sailing Club" },
+      {
+        id: "1",
+        name: "3X",
+        lat: 50.768333,
+        lon: -1.307167,
+        symbol: "Y",
+        description: "Island Sailing Club",
+      },
       { id: "2", name: "3T", lat: 50.768333, lon: -1.3145, symbol: "Y", description: "CHS" },
-      { id: "3", name: "34", lat: 50.769167, lon: -1.286667, symbol: "Y", description: "Cowes Corinthian" },
-      { id: "4", name: "far-mark", lat: 50.5, lon: -1.5, symbol: "Y", description: "Far away mark" },
+      {
+        id: "3",
+        name: "34",
+        lat: 50.769167,
+        lon: -1.286667,
+        symbol: "Y",
+        description: "Cowes Corinthian",
+      },
+      {
+        id: "4",
+        name: "far-mark",
+        lat: 50.5,
+        lon: -1.5,
+        symbol: "Y",
+        description: "Far away mark",
+      },
     ];
 
     it("should return marks within default radius of Cowes", () => {
       const nearbyMarks = getMarksByProximity(cowesAreaMarks);
-      
+
       // Should include marks within 5km of Cowes
       expect(nearbyMarks.length).toBeGreaterThan(0);
       expect(nearbyMarks.length).toBeLessThan(cowesAreaMarks.length);
@@ -226,15 +247,15 @@ describe("gpxParser", () => {
     it("should filter marks by custom radius", () => {
       // 2km radius - should only include very close marks
       const closeMarks = getMarksByProximity(cowesAreaMarks, 2000);
-      
+
       // Should exclude far-mark
-      expect(closeMarks.every(m => m.name !== "far-mark")).toBe(true);
+      expect(closeMarks.every((m) => m.name !== "far-mark")).toBe(true);
     });
 
     it("should return all marks within large radius", () => {
       // 100km radius - should include all marks
       const allMarks = getMarksByProximity(cowesAreaMarks, 100000);
-      
+
       expect(allMarks).toHaveLength(cowesAreaMarks.length);
     });
 
@@ -242,22 +263,22 @@ describe("gpxParser", () => {
       const marks: RacingMark[] = [
         { id: "1", name: "far", lat: 50.0, lon: -2.0, symbol: "Y", description: "Far mark" },
       ];
-      
+
       const nearbyMarks = getMarksByProximity(marks, 1000);
-      
+
       expect(nearbyMarks).toHaveLength(0);
     });
 
     it("should handle empty marks array", () => {
       const result = getMarksByProximity([]);
-      
+
       expect(result).toHaveLength(0);
     });
 
     it("should use cowesCenter coordinates correctly", () => {
       // Cowes is at approximately 50.76, -1.30
       expect(cowesCenter.lat).toBe(50.76);
-      expect(cowesCenter.lon).toBe(-1.30);
+      expect(cowesCenter.lon).toBe(-1.3);
     });
 
     it("should have reasonable default radius", () => {

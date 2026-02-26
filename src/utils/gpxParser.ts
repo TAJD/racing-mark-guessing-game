@@ -112,7 +112,7 @@ export function findNearbyMarks(
 // Cowes harbor center coordinates
 export const cowesCenter: { lat: number; lon: number } = {
   lat: 50.76,
-  lon: -1.30,
+  lon: -1.3,
 };
 
 // Default radius for Cowes proximity mode (in meters)

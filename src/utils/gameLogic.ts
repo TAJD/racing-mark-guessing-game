@@ -1,5 +1,11 @@
 import type { RacingMark, GameConfig, GuessResult } from "../types/game";
-import { calculateDistance, findNearbyMarks, getMarksByDifficulty, getMarksByProximity, DEFAULT_COWES_RADIUS } from "./gpxParser";
+import {
+  calculateDistance,
+  findNearbyMarks,
+  getMarksByDifficulty,
+  getMarksByProximity,
+  DEFAULT_COWES_RADIUS,
+} from "./gpxParser";
 
 // Generate a guess-the-mark question
 export function generateGuessQuestion(
@@ -9,7 +15,7 @@ export function generateGuessQuestion(
 ): { targetMark: RacingMark; options: RacingMark[]; contextMarks: RacingMark[] } {
   // Default to a new Set if not provided
   const usedSet = usedMarkIds ?? new Set<string>();
-  
+
   // Apply proximity filter if in Cowes mode
   let availableMarks = marks;
   if (config.proximityMode === "cowes") {
