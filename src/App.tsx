@@ -63,67 +63,49 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="max-w-2xl w-full">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-[#FDFCFB]">
+      <div className="flex items-center justify-center min-h-screen p-3 sm:p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden border border-[#E8E6E1]">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 md:p-8 text-center">
-              <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">
-                Solent Racing Mark Quiz
+            <div className="bg-[#1B2A4A] px-5 py-6 sm:px-6 sm:py-8 text-center border-b-4 border-[#C9A962]">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#C9A962]/10 flex items-center justify-center">
+                <svg className="w-8 h-8 text-[#C9A962]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.71 4.04c-.18-.18-.43-.29-.71-.29H4c-.28 0-.53.11-.71.29l-.04.04v.5l-1.3 8.4c-.19 1.2.68 2.35 1.89 2.56l11.22 1.93c.17.03.34.05.52.05.89 0 1.71-.51 2.11-1.33l1.45-2.96 2.96-1.45c.82-.4 1.33-1.22 1.33-2.11V4.37c0-.28-.11-.53-.29-.71l-.12-.12-.11-.11zM6.5 16.5l-1.09-7.51L18.3 5.8l-1.09 7.51c-.18 1.15-.98 2.14-2.1 2.44-.37.1-.75.15-1.14.15H6.5z"/>
+                </svg>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-serif font-semibold text-white tracking-wide">
+                Solent Racing Marks
               </h1>
-              <p className="text-blue-100 text-base md:text-lg">
-                Master sailing navigation and yacht racing marks in the Solent with our interactive
-                training game
+              <p className="text-slate-400 text-xs sm:text-sm mt-1">
+                Navigation Training
               </p>
             </div>
 
-            <div className="p-6 md:p-8">
-              {/* Game Description */}
-              <div className="mb-6 md:mb-8">
-                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 md:p-6 rounded-r-lg">
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">🎯</span>
-                    <div>
-                      <h2 className="text-lg md:text-xl font-semibold text-blue-700 mb-2">
-                        Sailing Navigation Training - How to Play
-                      </h2>
-                      <p className="text-gray-600 mb-3 text-sm md:text-base leading-relaxed">
-                        Practice identifying Solent racing marks on our interactive nautical chart.
-                        Perfect for RYA course preparation and yacht racing training. Use nearby
-                        context marks and chart features to master maritime navigation.
-                      </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs md:text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <span className="text-green-500">✓</span>
-                          <span>Multiple choice</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-green-500">✓</span>
-                          <span>Context marks</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-green-500">✓</span>
-                          <span>Time bonuses</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div className="p-5 sm:p-6">
+              {/* Description */}
+              <div className="mb-6 sm:mb-7">
+                <div className="bg-[#F8F7F5] border-l-2 border-[#1B2A4A] pl-4 py-3">
+                  <h2 className="text-sm font-medium text-[#1B2A4A] mb-1.5">
+                    How to Play
+                  </h2>
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                    Identify racing marks on an interactive chart. Use context clues and geographical knowledge to test your Solent navigation.
+                  </p>
                 </div>
               </div>
 
-              {/* Game Settings */}
-              <div className="bg-gray-50 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <span>⚙️</span>
-                  Racing Mark Quiz Settings
+              {/* Settings */}
+              <div className="bg-[#F8F7F5] rounded-lg p-4 sm:p-5 mb-5 sm:mb-6">
+                <h3 className="text-xs font-medium text-slate-500 uppercase tracking-widest mb-4">
+                  Settings
                 </h3>
 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-3.5">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Difficulty Level
+                      <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                        Difficulty
                       </label>
                       <select
                         value={gameConfig.difficulty}
@@ -135,19 +117,17 @@ function App() {
                             timeLimit: getTimeLimit(newDifficulty),
                           }));
                         }}
-                        className="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm md:text-base"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded text-sm focus:ring-1 focus:ring-[#1B2A4A] focus:border-[#1B2A4A] transition-colors"
                       >
-                        <option value="beginner">🌟 Beginner - Famous Solent racing marks</option>
-                        <option value="intermediate">
-                          ⭐ Intermediate - Mixed SCRA racing marks
-                        </option>
-                        <option value="advanced">🏆 Advanced - All Solent navigation marks</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Answer Options
+                      <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                        Options
                       </label>
                       <select
                         value={gameConfig.numberOfOptions}
@@ -157,16 +137,16 @@ function App() {
                             numberOfOptions: parseInt(e.target.value),
                           }))
                         }
-                        className="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm md:text-base"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded text-sm focus:ring-1 focus:ring-[#1B2A4A] focus:border-[#1B2A4A] transition-colors"
                       >
-                        <option value={5}>5 choices (standard)</option>
-                        <option value={6}>6 choices (expert)</option>
+                        <option value={5}>5 choices</option>
+                        <option value={6}>6 choices</option>
                       </select>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center p-3 bg-white rounded-lg border border-gray-200">
+                  <div className="space-y-2 pt-1">
+                    <label className="flex items-center gap-2.5 p-2 bg-white rounded border border-slate-200 cursor-pointer hover:border-slate-300 transition-colors">
                       <input
                         type="checkbox"
                         id="hints"
@@ -177,18 +157,12 @@ function App() {
                             hintEnabled: e.target.checked,
                           }))
                         }
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-3.5 w-3.5 text-[#1B2A4A] focus:ring-[#1B2A4A] border-slate-300 rounded"
                       />
-                      <label
-                        htmlFor="hints"
-                        className="ml-3 text-sm md:text-base text-gray-700 flex items-center gap-2"
-                      >
-                        <span>💡</span>
-                        <span>Enable hints for sponsored marks</span>
-                      </label>
-                    </div>
+                      <span className="text-xs text-slate-600">Show hints for sponsored marks</span>
+                    </label>
 
-                    <div className="flex items-center p-3 bg-white rounded-lg border border-gray-200">
+                    <label className="flex items-center gap-2.5 p-2 bg-white rounded border border-slate-200 cursor-pointer hover:border-slate-300 transition-colors">
                       <input
                         type="checkbox"
                         id="openSeaMap"
@@ -199,18 +173,12 @@ function App() {
                             openSeaMapEnabled: e.target.checked,
                           }))
                         }
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-3.5 w-3.5 text-[#1B2A4A] focus:ring-[#1B2A4A] border-slate-300 rounded"
                       />
-                      <label
-                        htmlFor="openSeaMap"
-                        className="ml-3 text-sm md:text-base text-gray-700 flex items-center gap-2"
-                      >
-                        <span>🗺️</span>
-                        <span>Show OpenSeaMap nautical chart layers</span>
-                      </label>
-                    </div>
+                      <span className="text-xs text-slate-600">Show nautical chart layers</span>
+                    </label>
 
-                    <div className="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <label className="flex items-center gap-2.5 p-2 bg-[#FFFBEB] rounded border border-[#FCD34D] cursor-pointer hover:border-[#FBBF24] transition-colors">
                       <input
                         type="checkbox"
                         id="cowesMode"
@@ -221,46 +189,36 @@ function App() {
                             proximityMode: e.target.checked ? "cowes" : "full",
                           }))
                         }
-                        className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-yellow-300 rounded"
+                        className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500 border-amber-300 rounded"
                       />
-                      <label
-                        htmlFor="cowesMode"
-                        className="ml-3 text-sm md:text-base text-yellow-800 flex items-center gap-2"
-                      >
-                        <span>🏴‍☠️</span>
-                        <span>Cowes Daring Mode - Marks within 5km of Cowes harbor</span>
-                      </label>
-                    </div>
+                      <span className="text-xs text-amber-800 font-medium">Cowes Daring Mode</span>
+                    </label>
                   </div>
                 </div>
               </div>
 
               {/* Start Button */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-5">
                 <button
                   onClick={handleGameStart}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-200 text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full sm:w-auto min-w-[200px]"
+                  className="bg-[#1B2A4A] hover:bg-[#2A3D5E] text-white font-medium py-2.5 px-8 rounded text-sm transition-all duration-200 shadow-sm hover:shadow-md w-full sm:w-auto"
                 >
-                  🚀 Start Game
+                  Begin Quiz
                 </button>
               </div>
 
               {/* Footer */}
-              <div className="text-center text-xs md:text-sm text-gray-500 border-t border-gray-200 pt-4">
-                <p className="leading-relaxed">
-                  Mark data from the{" "}
+              <div className="text-center text-[10px] text-slate-400 border-t border-slate-100 pt-3">
+                <p>
+                  Mark data from{" "}
                   <a
                     href="https://www.scra.org.uk/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                    className="text-slate-500 hover:text-[#1B2A4A] underline"
                   >
                     SCRA
                   </a>
-                  .
-                  <br className="hidden sm:inline" />
-                  Perfect for RYA course preparation, sailing instructors, and yacht racing crews
-                  mastering Solent navigation!
                 </p>
               </div>
             </div>
