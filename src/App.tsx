@@ -28,6 +28,7 @@ function App() {
       timeLimit: getTimeLimit("beginner"),
       hintEnabled: false,
       openSeaMapEnabled: false,
+      proximityMode: "full",
     };
   };
 
@@ -206,6 +207,28 @@ function App() {
                       >
                         <span>🗺️</span>
                         <span>Show OpenSeaMap nautical chart layers</span>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <input
+                        type="checkbox"
+                        id="cowesMode"
+                        checked={gameConfig.proximityMode === "cowes"}
+                        onChange={(e) =>
+                          setGameConfig((prev) => ({
+                            ...prev,
+                            proximityMode: e.target.checked ? "cowes" : "full",
+                          }))
+                        }
+                        className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-yellow-300 rounded"
+                      />
+                      <label
+                        htmlFor="cowesMode"
+                        className="ml-3 text-sm md:text-base text-yellow-800 flex items-center gap-2"
+                      >
+                        <span>🏴‍☠️</span>
+                        <span>Cowes Daring Mode - Marks within 5km of Cowes harbor</span>
                       </label>
                     </div>
                   </div>
