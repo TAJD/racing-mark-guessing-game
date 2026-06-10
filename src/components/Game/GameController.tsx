@@ -428,7 +428,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
   }
 
   const visibleMarks = marks || [];
-  const hiddenMarks: string[] = [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -451,7 +450,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
               center={mapCenter}
               zoom={mapZoom}
               highlightedMark={currentQuestion.targetMark.id}
-              hiddenMarks={hiddenMarks}
               className="h-[50vh] min-h-[300px]"
               openSeaMapEnabled={config.openSeaMapEnabled}
             />
@@ -498,7 +496,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
                   center={mapCenter}
                   zoom={mapZoom}
                   highlightedMark={currentQuestion.targetMark.id}
-                  hiddenMarks={hiddenMarks}
                   className="h-full rounded-lg"
                   openSeaMapEnabled={config.openSeaMapEnabled}
                 />
