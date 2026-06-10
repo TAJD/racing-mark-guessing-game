@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 import { cloudflare } from "@cloudflare/vite-plugin";
 
@@ -19,7 +20,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "happy-dom",
-    setupFiles: "./src/test/setup.ts",
+    setupFiles: [path.resolve(__dirname, "src/test/setup.ts")],
     pool: "threads",
     poolOptions: {
       threads: {
