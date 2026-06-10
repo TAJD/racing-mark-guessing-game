@@ -192,7 +192,7 @@ describe("GameController", () => {
         });
       }
 
-      expect(screen.getByText(/game complete/i)).toBeInTheDocument();
+      expect(screen.getByText(/navigation complete/i)).toBeInTheDocument();
     });
   });
 
@@ -209,7 +209,7 @@ describe("GameController", () => {
         });
       }
 
-      expect(screen.getByText(/game complete/i)).toBeInTheDocument();
+      expect(screen.getByText(/navigation complete/i)).toBeInTheDocument();
       expect(screen.getByText(/best streak/i)).toBeInTheDocument();
     });
   });
