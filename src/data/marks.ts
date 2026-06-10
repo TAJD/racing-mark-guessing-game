@@ -1,7 +1,8 @@
 import type { RacingMark } from "../types/game";
 import { parseGpxData } from "../utils/gpxParser";
 
-// GPX data is now loaded at runtime from the public/data/2025_racing_marks.gpx file
+// GPX data is now loaded at runtime from the public/data/2026_racing_marks.gpx file
+// (2025 file is kept alongside for season diffing — see docs/data/2026-mark-changes.md)
 
 // Parse the GPX data lazily to avoid build-time issues
 let _racingMarks: RacingMark[] | null = null;
@@ -9,7 +10,7 @@ let _racingMarks: RacingMark[] | null = null;
 export const getRacingMarks = async (): Promise<RacingMark[]> => {
   if (_racingMarks !== null) return _racingMarks;
   try {
-    const res = await fetch("/data/2025_racing_marks.gpx");
+    const res = await fetch("/data/2026_racing_marks.gpx");
     if (!res.ok) {
       throw new Error(`Failed to fetch GPX: ${res.status} ${res.statusText}`);
     }

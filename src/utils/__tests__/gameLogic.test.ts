@@ -91,7 +91,7 @@ describe("gameLogic", () => {
 
       expect(() => {
         generateGuessQuestion(smallMarkSet, { ...defaultConfig, numberOfOptions: 4 });
-      }).toThrow("Not enough marks available for this difficulty level");
+      }).toThrow("Not enough marks available for this number of options");
     });
 
     it("should include target mark in options", () => {

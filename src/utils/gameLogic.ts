@@ -26,7 +26,9 @@ export function generateGuessQuestion(
     );
   }
 
-  if (availableMarks.length < config.numberOfOptions) {
+  // Distractors are drawn from the full difficulty pool (ignoring usedSet),
+  // so target selection only needs a single unused mark
+  if (availableMarks.length === 0) {
     throw new Error("Not enough marks available for this difficulty level");
   }
 
