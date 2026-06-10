@@ -13,18 +13,14 @@ export function generateGuessQuestion(
   config: GameConfig,
   usedMarkIds?: Set<string>
 ): { targetMark: RacingMark; options: RacingMark[]; contextMarks: RacingMark[] } {
-  // Default to a new Set if not provided
   const usedSet = usedMarkIds ?? new Set<string>();
 
-  // Apply proximity filter if in Cowes mode
+  // Active difficulty pool for target selection
   let availableMarks = marks;
   if (config.proximityMode === "cowes") {
     const radius = config.cowesRadius ?? DEFAULT_COWES_RADIUS;
-    availableMarks = getMarksByProximity(marks, radius);
-    // In Cowes mode, use all marks regardless of difficulty
-    availableMarks = availableMarks.filter((mark) => !usedSet.has(mark.id));
+    availableMarks = getMarksByProximity(marks, radius).filter((mark) => !usedSet.has(mark.id));
   } else {
-    // Only use marks that haven't been used yet
     availableMarks = getMarksByDifficulty(availableMarks, config.difficulty).filter(
       (mark) => !usedSet.has(mark.id)
     );
@@ -34,31 +30,35 @@ export function generateGuessQuestion(
     throw new Error("Not enough marks available for this difficulty level");
   }
 
-  // Select a random target mark using crypto-based randomness
-  const targetMark = availableMarks[getCryptoRandomInt(availableMarks.length)];
+  const targetMark = availableMarks[Math.floor(Math.random() * availableMarks.length)];
+  // Only the target goes into usedSet — distractors may be reused
   usedSet.add(targetMark.id);
 
-  // Find nearby marks for context (within 2km)
   const contextMarks = findNearbyMarks(targetMark, marks, 2000);
 
-  // Generate wrong options - ensure at least one mark of the same type is included
+  // Distractor pool: prefer active difficulty pool, fall back to all marks
+  const difficultyPool =
+    config.proximityMode === "cowes" ? marks : getMarksByDifficulty(marks, config.difficulty);
+  const difficultyPoolIds = new Set(difficultyPool.map((m) => m.id));
+
   const wrongOptions: RacingMark[] = [];
   const usedIds = new Set([targetMark.id]);
 
-  // Check if we have enough total marks for the requested number of options
   const totalAvailableMarks = marks.filter((mark) => !usedIds.has(mark.id));
   if (totalAvailableMarks.length < config.numberOfOptions - 1) {
     throw new Error("Not enough marks available for this number of options");
   }
 
-  // First, find marks with the same symbol as the target (to make it harder)
-  const sameTypeMarks = marks.filter(
+  // Add at least one same-type mark — prefer from difficulty pool, fall back to all marks
+  const sameTypeFromPool = difficultyPool.filter(
     (mark) => !usedIds.has(mark.id) && mark.symbol === targetMark.symbol
   );
+  const sameTypeAll = marks.filter(
+    (mark) => !usedIds.has(mark.id) && mark.symbol === targetMark.symbol
+  );
+  const sameTypeMarks = sameTypeFromPool.length > 0 ? sameTypeFromPool : sameTypeAll;
 
-  // Add at least one mark of the same type if available
   if (sameTypeMarks.length > 0) {
-    // Select the nearest mark of the same type
     let nearestSameType = sameTypeMarks[0];
     let minDistance = calculateDistance(
       targetMark.lat,
@@ -77,18 +77,24 @@ export function generateGuessQuestion(
     usedIds.add(nearestSameType.id);
   }
 
-  // Fill remaining slots by prioritizing marks at a reasonable distance
   const remainingSlots = config.numberOfOptions - 1 - wrongOptions.length;
   if (remainingSlots > 0) {
     const goodDistanceOptions: RacingMark[] = [];
     const fallbackOptions: RacingMark[] = [];
-    // Exclude other same-type marks from remaining options
-    const allOtherMarks = marks.filter(
+
+    // Build distractor candidates: difficulty pool first, then non-pool marks as fallback
+    const candidatesFromPool = difficultyPool.filter(
       (mark) => !usedIds.has(mark.id) && mark.symbol !== targetMark.symbol
     );
+    const candidatesFallback = marks.filter(
+      (mark) =>
+        !usedIds.has(mark.id) &&
+        mark.symbol !== targetMark.symbol &&
+        !difficultyPoolIds.has(mark.id)
+    );
+    const allCandidates = [...candidatesFromPool, ...candidatesFallback];
 
-    // Separate marks into preferred and fallback lists
-    for (const mark of allOtherMarks) {
+    for (const mark of allCandidates) {
       const distance = calculateDistance(targetMark.lat, targetMark.lon, mark.lat, mark.lon);
       if (distance > 500 && distance < 10000) {
         goodDistanceOptions.push(mark);
@@ -101,8 +107,6 @@ export function generateGuessQuestion(
     shuffleArray(fallbackOptions);
 
     const combinedOptions = [...goodDistanceOptions, ...fallbackOptions];
-
-    // Add the required number of options from the combined list
     for (let i = 0; i < remainingSlots; i++) {
       const option = combinedOptions[i];
       if (option) {
@@ -112,12 +116,8 @@ export function generateGuessQuestion(
     }
   }
 
-  // Combine target and wrong options, then shuffle
   const options = [targetMark, ...wrongOptions];
   shuffleArray(options);
-
-  // Add all option IDs to usedSet to prevent repeats
-  options.forEach((mark) => usedSet.add(mark.id));
 
   return { targetMark, options, contextMarks };
 }
@@ -131,10 +131,8 @@ export function evaluateGuess(
 ): GuessResult {
   const isCorrect = targetMark.id === selectedMark.id;
 
-  // Base points for correct answer
   let points = isCorrect ? 100 : 0;
 
-  // Time bonus based on difficulty and time left
   let timeBonus = 0;
   if (isCorrect && config.timeLimit) {
     const maxBonusByDifficulty = {
@@ -149,7 +147,6 @@ export function evaluateGuess(
     points += timeBonus;
   }
 
-  // Difficulty multiplier
   const difficultyMultiplier = {
     beginner: 1,
     intermediate: 1.5,
@@ -167,72 +164,31 @@ export function evaluateGuess(
   };
 }
 
-// Get hint for a mark (progressive difficulty)
-export function getMarkHint(mark: RacingMark, hintLevel: number): string {
-  const hints = [
-    `This mark is in the ${getGeneralArea(mark)} area of the Solent.`,
-    `Look for a ${mark.symbol} colored mark.`,
-    `The mark is named "${mark.name.trim()}".`,
-    `Description: ${mark.description}`,
-    mark.sponsor ? `Sponsored by: ${mark.sponsor}` : "This is a navigation mark.",
-  ];
-
-  return hints[Math.min(hintLevel, hints.length - 1)];
-}
-
-// Get general area description based on coordinates
-function getGeneralArea(mark: RacingMark): string {
-  const { lat, lon } = mark;
-
-  // Very rough geographical areas of the Solent
-  if (lon < -1.6) return "western";
-  if (lon > -1.1) return "eastern";
-  if (lat > 50.8) return "northern";
-  if (lat < 50.7) return "southern";
-  return "central";
-}
-
-/**
- * Utility function to shuffle an array using crypto-based randomness
- */
 export function shuffleArray<T>(array: T[]): void {
   for (let i = array.length - 1; i > 0; i--) {
-    const j = getCryptoRandomInt(i + 1);
+    const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
 
-/**
- * Returns a random integer from 0 (inclusive) to max (exclusive) using crypto.getRandomValues.
- */
-function getCryptoRandomInt(max: number): number {
-  if (max <= 0) throw new Error("max must be positive");
-  const array = new Uint32Array(1);
-  window.crypto.getRandomValues(array);
-  return array[0] % max;
-}
-
-// Calculate streak bonus
 export function calculateStreakBonus(streak: number): number {
   if (streak < 3) return 0;
-  return Math.min(streak * 10, 100); // Max 100 bonus points
+  return Math.min(streak * 10, 100);
 }
 
-// Get difficulty-appropriate time limit
 export function getTimeLimit(difficulty: GameConfig["difficulty"]): number {
   switch (difficulty) {
     case "beginner":
-      return 30; // 30 seconds
+      return 30;
     case "intermediate":
-      return 20; // 20 seconds
+      return 20;
     case "advanced":
-      return 10; // 10 seconds
+      return 10;
     default:
       return 30;
   }
 }
 
-// Generate game statistics
 export function generateStats(
   totalQuestions: number,
   correctAnswers: number,
