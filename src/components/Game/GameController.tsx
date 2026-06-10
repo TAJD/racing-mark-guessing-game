@@ -13,6 +13,7 @@ import {
   generateStats,
   shuffleArray,
 } from "../../utils/gameLogic";
+import { QUESTIONS_PER_GAME } from "../../constants/app";
 
 type Stats = {
   accuracy: number;
@@ -39,12 +40,12 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     mode: "guess",
     score: 0,
     streak: 0,
+    bestStreak: 0,
     totalQuestions: 0,
     correctAnswers: 0,
     gameStartTime: Date.now(),
   });
 
-  // Track used mark IDs across questions
   const usedMarkIdsRef = useRef<Set<string>>(new Set());
 
   const [currentQuestion, setCurrentQuestion] = useState<{
@@ -57,41 +58,56 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
   const [showResult, setShowResult] = useState(false);
   const [lastResult, setLastResult] = useState<LastResult | undefined>(undefined);
   const [gameEnded, setGameEnded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([50.75, -1.3]);
   const [mapZoom, setMapZoom] = useState(11);
 
   const [marks, setMarks] = useState<RacingMark[] | null>(null);
 
+  // Refs for stable access inside timer callback without stale closures
+  const endTimeRef = useRef<number>(0);
+  const timeoutProcessedRef = useRef(false);
+  const currentQuestionRef = useRef(currentQuestion);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    currentQuestionRef.current = currentQuestion;
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
   const generateNewQuestion = useCallback(async () => {
     try {
       if (!marks || !Array.isArray(marks) || marks.length === 0) {
-        console.error("No marks available for question generation:", marks);
-        setGameEnded(true);
+        setLoadError("No marks available for question generation.");
         return;
       }
-      // Pass usedMarkIdsRef.current to generateGuessQuestion
       const { targetMark, options, contextMarks } = generateGuessQuestion(
         marks,
         config,
         usedMarkIdsRef.current
       );
       setCurrentQuestion({ targetMark, options, contextMarks });
+      setMapCenter([targetMark.lat, targetMark.lon]);
+      setMapZoom(13);
 
-      // Center map on target area with context marks visible
-      if (contextMarks.length > 0) {
-        const allMarks = [targetMark, ...contextMarks];
-        const avgLat = allMarks.reduce((sum, mark) => sum + mark.lat, 0) / allMarks.length;
-        const avgLon = allMarks.reduce((sum, mark) => sum + mark.lon, 0) / allMarks.length;
-        setMapCenter([avgLat, avgLon]);
-        setMapZoom(13);
-      }
-
-      setTimeRemaining(config.timeLimit || getTimeLimit(config.difficulty));
+      // Initialise deadline-based timer for this question
+      const limit = config.timeLimit || getTimeLimit(config.difficulty);
+      endTimeRef.current = Date.now() + limit * 1000;
+      timeoutProcessedRef.current = false;
+      setTimeRemaining(limit);
       setShowResult(false);
       setLastResult(undefined);
     } catch (error) {
       console.error("Error generating question:", error);
-      setGameEnded(true);
+      // Pool exhausted: end gracefully if at least one question was answered
+      if (gameStateRef.current.totalQuestions > 0) {
+        setGameEnded(true);
+      } else {
+        setLoadError("Unable to load questions. Please try again.");
+      }
     }
   }, [config, marks]);
 
@@ -100,8 +116,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     getRacingMarks()
       .then((data) => {
         if (!data || !Array.isArray(data) || data.length === 0) {
-          console.error("No racing marks loaded:", data);
-          setGameEnded(true);
+          setLoadError("No racing marks loaded. Please try again.");
         } else {
           const shuffled = [...data];
           shuffleArray(shuffled);
@@ -109,67 +124,68 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
           usedMarkIdsRef.current = new Set();
         }
       })
-      .catch((err) => {
-        console.error("Error loading racing marks:", err);
-        setGameEnded(true);
+      .catch(() => {
+        setLoadError("Unable to load racing marks. Please try again.");
       });
   }, []);
 
-  // Initialize first question when marks are loaded
+  // Generate first question once marks arrive
   useEffect(() => {
     if (marks) {
       generateNewQuestion();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marks, generateNewQuestion, config.openSeaMapEnabled]);
+  }, [marks, generateNewQuestion]);
 
-  // Timer effect
+  // Deadline-based timer: polls end timestamp so the interval never drifts.
+  // All timeout side-effects run at the top level of the callback — never inside
+  // a state-updater — so React StrictMode double-invocation is harmless.
   useEffect(() => {
-    if (timeRemaining <= 0 || showResult || gameEnded) return;
+    if (showResult || gameEnded || !currentQuestion) return;
 
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          // Handle timeout directly here to avoid stale closure issues
-          setGameState((currentState) => {
-            const newState = {
-              ...currentState,
-              totalQuestions: currentState.totalQuestions + 1,
-              streak: 0, // Reset streak on timeout
-            };
+    const tick = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
+      setTimeRemaining(remaining);
 
-            if (currentQuestion) {
-              setLastResult({
-                isCorrect: false,
-                points: 0,
-                timeBonus: 0,
-                streakBonus: 0,
-                totalPoints: 0,
-                correctMark: currentQuestion.targetMark,
-                timeout: true,
-              });
-            }
+      if (remaining <= 0 && !timeoutProcessedRef.current) {
+        timeoutProcessedRef.current = true;
 
-            setShowResult(true);
+        const question = currentQuestionRef.current;
+        const gs = gameStateRef.current;
+        const newTotal = gs.totalQuestions + 1;
 
-            setTimeout(() => {
-              if (newState.totalQuestions >= 10) {
-                setGameEnded(true);
-              } else {
-                generateNewQuestion();
-              }
-            }, 3000);
+        // Pure state update — no side effects inside updater
+        setGameState((prev) => ({
+          ...prev,
+          totalQuestions: prev.totalQuestions + 1,
+          streak: 0,
+        }));
 
-            return newState;
+        // Side effects at top level
+        if (question) {
+          setLastResult({
+            isCorrect: false,
+            points: 0,
+            timeBonus: 0,
+            streakBonus: 0,
+            totalPoints: 0,
+            correctMark: question.targetMark,
+            timeout: true,
           });
-          return 0;
         }
-        return prev - 1;
-      });
-    }, 1000);
+        setShowResult(true);
 
-    return () => clearInterval(timer);
-  }, [timeRemaining, showResult, gameEnded, currentQuestion, generateNewQuestion]);
+        setTimeout(() => {
+          if (newTotal >= QUESTIONS_PER_GAME) {
+            setGameEnded(true);
+          } else {
+            generateNewQuestion();
+          }
+        }, 3000);
+      }
+    }, 250);
+
+    return () => clearInterval(tick);
+  }, [showResult, gameEnded, generateNewQuestion, currentQuestion]);
 
   const handleGuessAnswer = useCallback(
     (selectedMark: RacingMark) => {
@@ -178,36 +194,38 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
       const timeElapsed = (config.timeLimit || getTimeLimit(config.difficulty)) - timeRemaining;
       const result = evaluateGuess(currentQuestion.targetMark, selectedMark, timeElapsed, config);
 
-      setGameState((prev) => {
-        const streakBonus = result.isCorrect ? calculateStreakBonus(prev.streak + 1) : 0;
-        const totalPoints = result.points + streakBonus;
+      // Compute all derived values before touching state — not inside an updater
+      const prevState = gameStateRef.current;
+      const newStreak = result.isCorrect ? prevState.streak + 1 : 0;
+      const streakBonus = result.isCorrect ? calculateStreakBonus(prevState.streak + 1) : 0;
+      const totalPoints = result.points + streakBonus;
+      const newTotal = prevState.totalQuestions + 1;
 
-        if (currentQuestion) {
-          usedMarkIdsRef.current.add(currentQuestion.targetMark.id);
+      // Side effect: track used mark
+      usedMarkIdsRef.current.add(currentQuestion.targetMark.id);
+
+      // Pure state update
+      setGameState((prev) => ({
+        ...prev,
+        score: prev.score + totalPoints,
+        streak: newStreak,
+        bestStreak: Math.max(prev.bestStreak, newStreak),
+        totalQuestions: prev.totalQuestions + 1,
+        correctAnswers: prev.correctAnswers + (result.isCorrect ? 1 : 0),
+        lastAnswerTime: Date.now(),
+      }));
+
+      // Side effects at top level
+      setLastResult({ ...result, streakBonus, totalPoints });
+      setShowResult(true);
+
+      setTimeout(() => {
+        if (newTotal >= QUESTIONS_PER_GAME) {
+          setGameEnded(true);
+        } else {
+          generateNewQuestion();
         }
-
-        const newState = {
-          ...prev,
-          score: prev.score + totalPoints,
-          streak: result.isCorrect ? prev.streak + 1 : 0,
-          totalQuestions: prev.totalQuestions + 1,
-          correctAnswers: prev.correctAnswers + (result.isCorrect ? 1 : 0),
-          lastAnswerTime: Date.now(),
-        };
-
-        setLastResult({ ...result, streakBonus, totalPoints });
-        setShowResult(true);
-
-        setTimeout(() => {
-          if (newState.totalQuestions >= 10) {
-            setGameEnded(true);
-          } else {
-            generateNewQuestion();
-          }
-        }, 3000);
-
-        return newState;
-      });
+      }, 3000);
     },
     [currentQuestion, timeRemaining, config, gameEnded, generateNewQuestion]
   );
@@ -225,6 +243,25 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
       onGameEnd(gameState.score, stats);
     }
   }, [gameEnded, gameState, onGameEnd]);
+
+  // Distinct error state — no celebration, simple retry
+  if (loadError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="text-center max-w-sm">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Unable to Load Game</h2>
+          <p className="text-gray-600 mb-6">{loadError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (gameEnded) {
     const gameTime = (Date.now() - (gameState.gameStartTime || Date.now())) / 1000;
@@ -315,7 +352,7 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
                   </div>
 
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-800">{gameState.streak}</div>
+                    <div className="text-2xl font-bold text-gray-800">{gameState.bestStreak}</div>
                     <div className="text-xs text-gray-600">Best Streak</div>
                   </div>
 
@@ -390,7 +427,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
     );
   }
 
-  // Get marks to display on map - show all loaded marks
   const visibleMarks = marks || [];
   const hiddenMarks: string[] = [];
 
@@ -409,7 +445,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
 
         {/* Mobile Layout: Stack vertically */}
         <div className="md:hidden">
-          {/* Map Section - Full width on mobile */}
           <div className="bg-white mt-[64px]">
             <OpenSeaMapContainer
               marks={visibleMarks}
@@ -422,7 +457,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
             />
           </div>
 
-          {/* Game Panel - Bottom sheet style */}
           <div className="p-4">
             <GuessMode
               targetMark={currentQuestion.targetMark}
@@ -431,10 +465,10 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
               showResult={showResult}
               result={lastResult}
               disabled={gameEnded}
+              hintEnabled={config.hintEnabled}
             />
           </div>
 
-          {/* Legend - Collapsible on mobile */}
           <div className="px-4 pb-4">
             <MarkLegend className="max-w-full" />
           </div>
@@ -443,7 +477,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
         {/* Desktop Layout: Side by side */}
         <div className="hidden md:block">
           <div className="flex gap-6 p-6 h-[calc(100vh-120px)]">
-            {/* Game Panel */}
             <div className="w-96 flex-shrink-0 h-full">
               <div className="h-full">
                 <GuessMode
@@ -453,11 +486,11 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
                   showResult={showResult}
                   result={lastResult}
                   disabled={gameEnded}
+                  hintEnabled={config.hintEnabled}
                 />
               </div>
             </div>
 
-            {/* Map */}
             <div className="flex-1 h-full">
               <div className="bg-white rounded-lg shadow-sm border h-full">
                 <OpenSeaMapContainer
@@ -473,7 +506,6 @@ export function GameController({ config, onGameEnd }: GameControllerProps) {
             </div>
           </div>
 
-          {/* Legend - Desktop */}
           <div className="px-6 pb-6">
             <MarkLegend className="mx-auto max-w-4xl" />
           </div>

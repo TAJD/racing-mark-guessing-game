@@ -8,6 +8,7 @@ interface GuessModeProps {
   showResult: boolean;
   result?: GuessResult & { streakBonus?: number; totalPoints?: number; timeout?: boolean };
   disabled: boolean;
+  hintEnabled: boolean;
 }
 
 export function GuessMode({
@@ -17,6 +18,7 @@ export function GuessMode({
   showResult,
   result,
   disabled,
+  hintEnabled,
 }: GuessModeProps) {
   if (showResult && result) {
     return (
@@ -113,7 +115,7 @@ export function GuessMode({
     <div className="bg-white rounded-lg shadow-sm border h-full flex flex-col">
       <div className="p-4 md:p-6 flex-1 flex flex-col">
         <div className="mb-6">
-          {targetMark.sponsor && !targetMark.sponsorHintDisallowed && (
+          {hintEnabled && targetMark.sponsor && !targetMark.sponsorHintDisallowed && (
             <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
               <div className="flex items-start gap-2">
                 <span className="text-blue-600 text-sm mt-0.5">💡</span>
