@@ -7,22 +7,8 @@ import "./App.css";
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
 
-  // Load cached config from localStorage if present
   const getInitialConfig = (): GameConfig => {
-    const cached = localStorage.getItem("gameConfig");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        // Ensure timeLimit is set based on difficulty if missing
-        if (!parsed.timeLimit && parsed.difficulty) {
-          parsed.timeLimit = getTimeLimit(parsed.difficulty);
-        }
-        return parsed;
-      } catch {
-        // Fallback to default if parsing fails
-      }
-    }
-    return {
+    const defaults: GameConfig = {
       difficulty: "beginner",
       numberOfOptions: 5,
       timeLimit: getTimeLimit("beginner"),
@@ -30,6 +16,50 @@ function App() {
       openSeaMapEnabled: false,
       proximityMode: "full",
     };
+
+    const cached = localStorage.getItem("gameConfig");
+    if (!cached) return defaults;
+
+    try {
+      const p = JSON.parse(cached);
+      if (typeof p !== "object" || p === null) return defaults;
+
+      const difficulty = (["beginner", "intermediate", "advanced"] as const).includes(p.difficulty)
+        ? (p.difficulty as GameConfig["difficulty"])
+        : defaults.difficulty;
+
+      const numberOfOptions =
+        typeof p.numberOfOptions === "number" && p.numberOfOptions >= 2 && p.numberOfOptions <= 10
+          ? p.numberOfOptions
+          : defaults.numberOfOptions;
+
+      const timeLimit =
+        typeof p.timeLimit === "number" && p.timeLimit > 0 ? p.timeLimit : getTimeLimit(difficulty);
+
+      const hintEnabled = typeof p.hintEnabled === "boolean" ? p.hintEnabled : defaults.hintEnabled;
+
+      const openSeaMapEnabled =
+        typeof p.openSeaMapEnabled === "boolean" ? p.openSeaMapEnabled : defaults.openSeaMapEnabled;
+
+      const proximityMode = (["cowes", "full"] as const).includes(p.proximityMode)
+        ? (p.proximityMode as GameConfig["proximityMode"])
+        : defaults.proximityMode;
+
+      const cowesRadius =
+        typeof p.cowesRadius === "number" && p.cowesRadius > 0 ? p.cowesRadius : undefined;
+
+      return {
+        difficulty,
+        numberOfOptions,
+        timeLimit,
+        hintEnabled,
+        openSeaMapEnabled,
+        proximityMode,
+        cowesRadius,
+      };
+    } catch {
+      return defaults;
+    }
   };
 
   const [gameConfig, setGameConfig] = useState<GameConfig>(getInitialConfig());
