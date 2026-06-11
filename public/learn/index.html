@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/yacht-favicon.svg" />
     <title>Solent Racing Marks Explained: Buoyage Guide &amp; How to Play | Guess the Mark</title>
     <meta
       name="description"
@@ -116,6 +117,46 @@
         color: var(--text);
         font-family: var(--sans);
         line-height: 1.6;
+      }
+
+      .site-nav {
+        background: var(--navy);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem;
+      }
+
+      .site-nav .brand {
+        color: #fff;
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+      }
+
+      .site-nav .links {
+        display: flex;
+        gap: 1.1rem;
+      }
+
+      .site-nav .links a {
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        text-decoration: none;
+      }
+
+      .site-nav .links a:hover {
+        color: #fff;
+      }
+
+      .site-nav .links a[aria-current="page"] {
+        color: var(--gold);
+        font-weight: 500;
       }
 
       a {
@@ -492,6 +533,14 @@
   </head>
 
   <body>
+    <nav class="site-nav" aria-label="Site">
+      <a class="brand" href="/">Guess the Mark</a>
+      <div class="links">
+        <a href="/">Play</a>
+        <a href="/learn/" aria-current="page">Learn the Marks</a>
+        <a href="/solent-racing-marks-2026/">2026 Changes</a>
+      </div>
+    </nav>
     <header>
       <p class="eyebrow">Solent Racing &mdash; Navigation Guide</p>
       <h1>Solent Racing Marks: A Complete Guide</h1>

@@ -119,8 +119,31 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB]">
-      <div className="flex items-center justify-center min-h-screen p-3 sm:p-4">
+    <div className="min-h-screen bg-[#FDFCFB] flex flex-col">
+      {/* Site navigation — matches the .site-nav bar on the static pages */}
+      <nav
+        aria-label="Site"
+        className="bg-[#1B2A4A] border-b border-white/10 flex items-center justify-between flex-wrap gap-2 px-4 py-2.5"
+      >
+        <a href="/" className="text-white font-serif font-semibold text-sm tracking-wide">
+          Guess the Mark
+        </a>
+        <div className="flex gap-4 text-xs">
+          <a href="/" aria-current="page" className="text-[#C9A962] font-medium">
+            Play
+          </a>
+          <a href="/learn/" className="text-slate-300 hover:text-white transition-colors">
+            Learn the Marks
+          </a>
+          <a
+            href="/solent-racing-marks-2026/"
+            className="text-slate-300 hover:text-white transition-colors"
+          >
+            2026 Changes
+          </a>
+        </div>
+      </nav>
+      <div className="flex-1 flex items-center justify-center p-3 sm:p-4">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden border border-[#E8E6E1]">
             {/* Header */}
