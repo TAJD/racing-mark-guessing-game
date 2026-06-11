@@ -15,3 +15,4 @@
 {"id":"int-f2c91393","kind":"field_change","created_at":"2026-06-10T19:26:13.3325631Z","actor":"Thomas Dickson","issue_id":"racing-mark-guessing-game-9gf","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
 {"id":"int-b2d990df","kind":"field_change","created_at":"2026-06-11T06:46:55.0887203Z","actor":"Thomas Dickson","issue_id":"racing-mark-guessing-game-eiw","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-a274d465","kind":"field_change","created_at":"2026-06-11T07:06:05.7273483Z","actor":"Thomas Dickson","issue_id":"racing-mark-guessing-game-cqn","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-5fd184aa","kind":"field_change","created_at":"2026-06-11T07:30:02.5716639Z","actor":"Thomas Dickson","issue_id":"racing-mark-guessing-game-cmy","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
