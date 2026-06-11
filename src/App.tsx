@@ -2,27 +2,14 @@ import React, { useState } from "react";
 import { GameController } from "./components/Game/GameController";
 import type { GameConfig } from "./types/game";
 import { getTimeLimit } from "./utils/gameLogic";
+import { getHighScore, saveGameResult } from "./utils/statsStorage";
 import "./App.css";
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
 
-  // Load cached config from localStorage if present
   const getInitialConfig = (): GameConfig => {
-    const cached = localStorage.getItem("gameConfig");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        // Ensure timeLimit is set based on difficulty if missing
-        if (!parsed.timeLimit && parsed.difficulty) {
-          parsed.timeLimit = getTimeLimit(parsed.difficulty);
-        }
-        return parsed;
-      } catch {
-        // Fallback to default if parsing fails
-      }
-    }
-    return {
+    const defaults: GameConfig = {
       difficulty: "beginner",
       numberOfOptions: 5,
       timeLimit: getTimeLimit("beginner"),
@@ -30,12 +17,66 @@ function App() {
       openSeaMapEnabled: false,
       proximityMode: "full",
     };
+
+    const cached = localStorage.getItem("gameConfig");
+    if (!cached) return defaults;
+
+    try {
+      const p = JSON.parse(cached);
+      if (typeof p !== "object" || p === null) return defaults;
+
+      const difficulty = (["beginner", "intermediate", "advanced"] as const).includes(p.difficulty)
+        ? (p.difficulty as GameConfig["difficulty"])
+        : defaults.difficulty;
+
+      const numberOfOptions =
+        typeof p.numberOfOptions === "number" && p.numberOfOptions >= 2 && p.numberOfOptions <= 10
+          ? p.numberOfOptions
+          : defaults.numberOfOptions;
+
+      const timeLimit =
+        typeof p.timeLimit === "number" && p.timeLimit > 0 ? p.timeLimit : getTimeLimit(difficulty);
+
+      const hintEnabled = typeof p.hintEnabled === "boolean" ? p.hintEnabled : defaults.hintEnabled;
+
+      const openSeaMapEnabled =
+        typeof p.openSeaMapEnabled === "boolean" ? p.openSeaMapEnabled : defaults.openSeaMapEnabled;
+
+      const proximityMode = (["cowes", "full"] as const).includes(p.proximityMode)
+        ? (p.proximityMode as GameConfig["proximityMode"])
+        : defaults.proximityMode;
+
+      const cowesRadius =
+        typeof p.cowesRadius === "number" && p.cowesRadius > 0 ? p.cowesRadius : undefined;
+
+      return {
+        difficulty,
+        numberOfOptions,
+        timeLimit,
+        hintEnabled,
+        openSeaMapEnabled,
+        proximityMode,
+        cowesRadius,
+      };
+    } catch {
+      return defaults;
+    }
   };
 
   const [gameConfig, setGameConfig] = useState<GameConfig>(getInitialConfig());
+  const [gameKey, setGameKey] = useState(0);
+  const [highScore, setHighScore] = useState(() => getHighScore());
 
   const handleGameStart = () => {
     setGameStarted(true);
+  };
+
+  const handlePlayAgain = () => {
+    setGameKey((k) => k + 1);
+  };
+
+  const handleChangeSettings = () => {
+    setGameStarted(false);
   };
 
   // Save config to localStorage on change
@@ -52,14 +93,29 @@ function App() {
     averageTime: number;
     pointsPerMinute: number;
     grade: string;
+    bestStreak?: number;
   };
   const handleGameEnd = (finalScore: number, stats: Stats) => {
-    console.log("Game ended with score:", finalScore, "Stats:", stats);
-    // Could save to local storage or send to API
+    const { highScore: newHighScore } = saveGameResult(
+      finalScore,
+      stats.accuracy,
+      stats.grade,
+      stats.bestStreak ?? 0
+    );
+    setHighScore(newHighScore);
   };
 
   if (gameStarted) {
-    return <GameController config={gameConfig} onGameEnd={handleGameEnd} />;
+    return (
+      <GameController
+        key={gameKey}
+        config={gameConfig}
+        onGameEnd={handleGameEnd}
+        onPlayAgain={handlePlayAgain}
+        onChangeSettings={handleChangeSettings}
+        highScore={highScore}
+      />
+    );
   }
 
   return (
@@ -194,6 +250,18 @@ function App() {
                 </div>
               </div>
 
+              {/* Personal Best */}
+              {highScore > 0 && (
+                <div className="text-center mb-4 py-2 px-4 bg-[#F8F7F5] border border-[#E8E6E1] rounded flex items-center justify-center gap-2">
+                  <span className="text-xs text-slate-500 uppercase tracking-widest">
+                    Personal Best
+                  </span>
+                  <span className="text-sm font-serif font-semibold text-[#1B2A4A]">
+                    {highScore}
+                  </span>
+                </div>
+              )}
+
               {/* Start Button */}
               <div className="text-center mb-5">
                 <button
@@ -215,6 +283,14 @@ function App() {
                     className="text-slate-500 hover:text-[#1B2A4A] underline"
                   >
                     SCRA
+                  </a>
+                </p>
+                <p className="mt-1">
+                  <a
+                    href="/solent-racing-marks-2026/"
+                    className="text-slate-500 hover:text-[#1B2A4A] underline"
+                  >
+                    2026 mark changes
                   </a>
                 </p>
               </div>

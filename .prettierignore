@@ -1,0 +1,9 @@
+# Machine-managed / non-source directories
+.beads/
+.claude/
+.wrangler/
+.playwright/
+playwright-output/
+pnpm-lock.yaml
+worker-configuration.d.ts
+.playwright-mcp/

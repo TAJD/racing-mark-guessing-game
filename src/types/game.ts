@@ -13,10 +13,9 @@ export interface RacingMark {
 
 export interface GameState {
   mode: "guess";
-  currentMark?: RacingMark;
-  options?: RacingMark[];
   score: number;
   streak: number;
+  bestStreak: number;
   totalQuestions: number;
   correctAnswers: number;
   gameStartTime?: number;

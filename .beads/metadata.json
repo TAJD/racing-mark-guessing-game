@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "racing_mark_guessing_game",
+  "project_id": "dc994b66-8452-49f7-9b89-ebb10c5683a0"
+}

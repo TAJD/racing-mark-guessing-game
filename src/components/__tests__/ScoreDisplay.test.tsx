@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, afterEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
 import { ScoreDisplay } from "../Game/ScoreDisplay";
 import type { GameState } from "../../types/game";
 
@@ -7,12 +7,14 @@ const createMockGameState = (overrides: Partial<GameState> = {}): GameState => (
   mode: "guess",
   score: 0,
   streak: 0,
+  bestStreak: 0,
   totalQuestions: 0,
   correctAnswers: 0,
   ...overrides,
 });
 
 describe("ScoreDisplay", () => {
+  afterEach(cleanup);
   it("should render score correctly", () => {
     const gameState = createMockGameState({ score: 150 });
     render(<ScoreDisplay gameState={gameState} timeRemaining={30} />);

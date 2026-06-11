@@ -3,7 +3,6 @@ import * as gameLogic from "../gameLogic";
 import {
   generateGuessQuestion,
   evaluateGuess,
-  getMarkHint,
   calculateStreakBonus,
   getTimeLimit,
   generateStats,
@@ -92,7 +91,7 @@ describe("gameLogic", () => {
 
       expect(() => {
         generateGuessQuestion(smallMarkSet, { ...defaultConfig, numberOfOptions: 4 });
-      }).toThrow("Not enough marks available for this difficulty level");
+      }).toThrow("Not enough marks available for this number of options");
     });
 
     it("should include target mark in options", () => {
@@ -102,7 +101,6 @@ describe("gameLogic", () => {
     });
 
     it("should select the nearest same-type mark as a wrong option", () => {
-      // Use only allowed MarkSymbol values
       type MarkSymbol = "Y" | "G" | "R" | "B";
       const target = {
         id: "target",
@@ -142,13 +140,11 @@ describe("gameLogic", () => {
       };
       const marks = [target, nearSameType, farSameType, unrelated];
       const config = { ...defaultConfig, numberOfOptions: 3 };
-      // Run multiple times to ensure target is selected at least once
       let found = false;
       for (let i = 0; i < 20; i++) {
         const { targetMark, options } = gameLogic.generateGuessQuestion(marks, config);
         if (targetMark.id === target.id) {
           found = true;
-          // If any same-type mark is present, it must be the nearest one
           const sameTypeOptions = options.filter(
             (opt) => opt.symbol === "R" && opt.id !== target.id
           );
@@ -158,6 +154,24 @@ describe("gameLogic", () => {
         }
       }
       expect(found).toBe(true);
+    });
+
+    it("should throw when pool is exhausted via usedSet", () => {
+      const usedSet = new Set(mockMarks.map((m) => m.id));
+      expect(() => {
+        generateGuessQuestion(mockMarks, defaultConfig, usedSet);
+      }).toThrow("Not enough marks available for this difficulty level");
+    });
+
+    it("should not add distractor IDs to usedSet, only the target", () => {
+      const usedSet = new Set<string>();
+      const result = generateGuessQuestion(mockMarks, defaultConfig, usedSet);
+      expect(usedSet.has(result.targetMark.id)).toBe(true);
+      const distractors = result.options.filter((o) => o.id !== result.targetMark.id);
+      // Distractors should NOT be in usedSet
+      for (const d of distractors) {
+        expect(usedSet.has(d.id)).toBe(false);
+      }
     });
   });
 
@@ -197,28 +211,6 @@ describe("gameLogic", () => {
       const advancedResult = evaluateGuess(targetMark, targetMark, 10, advancedConfig);
 
       expect(advancedResult.points).toBeGreaterThan(beginnerResult.points);
-    });
-  });
-
-  describe("getMarkHint", () => {
-    const mark = mockMarks[0];
-
-    it("should return different hints for different levels", () => {
-      const hint1 = getMarkHint(mark, 0);
-      const hint2 = getMarkHint(mark, 1);
-      const hint3 = getMarkHint(mark, 2);
-
-      expect(hint1).toBeDefined();
-      expect(hint2).toBeDefined();
-      expect(hint3).toBeDefined();
-      expect(hint1).not.toBe(hint2);
-      expect(hint2).not.toBe(hint3);
-    });
-
-    it("should include mark name in higher level hints", () => {
-      const nameHint = getMarkHint(mark, 2);
-
-      expect(nameHint).toContain(mark.name);
     });
   });
 

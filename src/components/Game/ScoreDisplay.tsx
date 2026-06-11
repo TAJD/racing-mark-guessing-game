@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { GameState } from "../../types/game";
+import { QUESTIONS_PER_GAME } from "../../constants/app";
 
 interface ScoreDisplayProps {
   gameState: GameState;
@@ -50,7 +51,7 @@ export function ScoreDisplay({ gameState, timeRemaining }: ScoreDisplayProps) {
               Question
             </div>
             <div className="font-semibold text-sm" data-testid="question-progress">
-              {gameState.totalQuestions + 1}/10
+              {gameState.totalQuestions + 1}/{QUESTIONS_PER_GAME}
             </div>
           </div>
         </div>
@@ -105,7 +106,7 @@ export function ScoreDisplay({ gameState, timeRemaining }: ScoreDisplayProps) {
             Mode:
           </span>
           <span className="font-semibold" data-testid="mode-value">
-            {gameState.mode === "guess" ? "🔍 Guess" : gameState.mode}
+            🔍 Guess
           </span>
         </div>
 
@@ -114,7 +115,7 @@ export function ScoreDisplay({ gameState, timeRemaining }: ScoreDisplayProps) {
             Question:
           </span>
           <span className="font-semibold" data-testid="question-progress-inline">
-            {gameState.totalQuestions + 1}/10
+            {gameState.totalQuestions + 1}/{QUESTIONS_PER_GAME}
           </span>
         </div>
 
