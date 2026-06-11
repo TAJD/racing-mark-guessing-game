@@ -40,3 +40,6 @@ map-perf/
 ux-polish/
 # bd worktree
 update-post/
+
+# Playwright MCP artifacts
+.playwright-mcp/

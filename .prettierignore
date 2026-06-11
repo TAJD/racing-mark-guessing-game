@@ -6,3 +6,4 @@
 playwright-output/
 pnpm-lock.yaml
 worker-configuration.d.ts
+.playwright-mcp/

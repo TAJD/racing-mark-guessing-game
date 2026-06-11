@@ -201,8 +201,10 @@ export function OpenSeaMapContainer({
     }
   }, [center, zoom, highlightedMark, marks]);
 
+  // isolate contains Leaflet's internal z-indexes (up to 1000) so they
+  // can't paint over the app's sticky header
   return (
-    <div className={className}>
+    <div className={`isolate ${className}`}>
       <div ref={containerRef} className="w-full h-full rounded-lg" />
       <style>{`
         .racing-mark-icon {

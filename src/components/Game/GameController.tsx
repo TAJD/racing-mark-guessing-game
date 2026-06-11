@@ -497,7 +497,7 @@ export function GameController({
 
         {/* Mobile Layout: Stack vertically */}
         <div className="md:hidden">
-          <div className="bg-white mt-[64px]">
+          <div className="bg-white">
             <OpenSeaMapContainer
               marks={visibleMarks}
               center={mapCenter}

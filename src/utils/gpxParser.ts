@@ -20,13 +20,15 @@ export function parseGpxData(gpxContent: string): RacingMark[] {
     if (nameElement && symElement && descElement) {
       const name = nameElement.textContent?.trim() || "";
       const symbol = (symElement.textContent?.trim() as MarkSymbol) || "Y";
-      const description = descElement.textContent?.trim() || "";
+      const rawDescription = descElement.textContent?.trim() || "";
 
-      // Extract sponsor from description if it contains * or @
+      // Extract sponsor from description if it contains * or @,
+      // then strip the marker so it never shows in the UI
       const sponsor =
-        description.includes("*") || description.includes("@")
-          ? description.split(/[*@]/)[0].trim()
+        rawDescription.includes("*") || rawDescription.includes("@")
+          ? rawDescription.split(/[*@]/)[0].trim()
           : undefined;
+      const description = rawDescription.replace(/\s*[*@]\s*/g, " ").trim();
 
       marks.push({
         id: `mark-${i}`,
