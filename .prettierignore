@@ -7,3 +7,6 @@ playwright-output/
 pnpm-lock.yaml
 worker-configuration.d.ts
 .playwright-mcp/
+# leftover bd worktree dirs (locked by running sessions)
+tutorial/
+update-post/

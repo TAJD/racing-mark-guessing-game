@@ -8,7 +8,9 @@ export default tseslint.config(
   { ignores: ["dist"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["**/*.{ts,tsx}"],
+    // Scoped to the real source tree so stray git worktree directories
+    // (bd creates them inside the repo root) are never linted
+    files: ["src/**/*.{ts,tsx}", "worker/**/*.{ts,tsx}", "*.ts"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

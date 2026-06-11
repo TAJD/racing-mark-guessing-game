@@ -24,6 +24,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "happy-dom",
+    // Scoped so stray git worktree directories inside the repo root
+    // (bd worktree create) don't get their tests collected
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
     setupFiles: [resolve(__dirname, "src/test/setup.ts")],
     pool: "threads",
     poolOptions: {
