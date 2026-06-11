@@ -292,6 +292,10 @@ function App() {
                   >
                     2026 mark changes
                   </a>
+                  {" · "}
+                  <a href="/learn/" className="text-slate-500 hover:text-[#1B2A4A] underline">
+                    Learn the marks
+                  </a>
                 </p>
               </div>
             </div>
