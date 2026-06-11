@@ -285,6 +285,14 @@ function App() {
                     SCRA
                   </a>
                 </p>
+                <p className="mt-1">
+                  <a
+                    href="/solent-racing-marks-2026/"
+                    className="text-slate-500 hover:text-[#1B2A4A] underline"
+                  >
+                    2026 mark changes
+                  </a>
+                </p>
               </div>
             </div>
           </div>
